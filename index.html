@@ -69,7 +69,7 @@
         body[data-font="satoshi"] { 
             --font-display: 'Outfit', sans-serif; 
             --font-body: 'Plus Jakarta Sans', sans-serif; 
-            --tracking-display: -0.035em;
+            --tracking-display: -0.04em;
         }
         
         /* 2. Modern Geometric */
@@ -83,7 +83,7 @@
         body[data-font="swiss"] { 
             --font-display: 'Inter', sans-serif; 
             --font-body: 'Inter', sans-serif; 
-            --tracking-display: -0.04em; /* Very tight for Inter headers */
+            --tracking-display: -0.045em; /* Very tight for Inter headers */
         }
         
         /* 4. Bold Poster */
@@ -257,4 +257,344 @@
         }
         
         .project-card:hover .card-title { transform: translateY(0); }
-        .card-action { font-family:
+        .card-action { font-family: var(--font-body); font-size: 0.8rem; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; text-transform: uppercase; }
+
+        /* --- 6. CONTACT FORM SECTION --- */
+        .contact-section {
+            padding: 6rem 0 8rem 0;
+            background: var(--bg-color);
+            transition: background 0.4s;
+            border-top: 1px solid var(--text-muted);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-text h2 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            letter-spacing: var(--tracking-display);
+            text-transform: uppercase;
+        }
+
+        .contact-text p {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 400px;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            padding: 1.2rem;
+            font-family: var(--font-body);
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: border 0.3s, background 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--text-main);
+        }
+
+        .submit-btn {
+            align-self: flex-start;
+            padding: 1rem 3rem;
+            background: var(--text-main);
+            color: var(--bg-color);
+            font-family: var(--font-display);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* --- 7. FLOATING PLAYER & MODAL --- */
+        #floatingPlayer { 
+            position: fixed; 
+            bottom: 40px; right: 40px; 
+            /* CINEMATIC SIZE */
+            width: 1100px; 
+            max-width: 90vw; 
+            aspect-ratio: 16/9; 
+            background: #000; z-index: 5000; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
+            display: none; animation: slideIn 0.6s; 
+        }
+        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .floating-header { position: absolute; top: -40px; right: 0; }
+        .close-float { background: var(--text-main); color: var(--bg-color); border: none; width: 32px; height: 32px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; opacity: 0; transition: opacity 0.4s; }
+        [data-theme="light"] .modal { background: rgba(255,255,255,0.98); }
+        .modal.open { display: flex; opacity: 1; }
+        .modal-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .close-modal { position: absolute; top: 3rem; right: 3rem; color: var(--text-main); font-size: 2.5rem; cursor: pointer; background: none; border: none; z-index: 2001; font-family: var(--font-display); }
+        .video-wrapper { width: 85%; max-width: 1400px; aspect-ratio: 16/9; background: #000; box-shadow: 0 40px 80px rgba(0,0,0,0.2); }
+        iframe { width: 100%; height: 100%; border: none; }
+        #modalTitle { font-family: var(--font-display); color: var(--text-main); font-weight: 600; font-size: 1.2rem; margin-top: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* --- 8. FOOTER --- */
+        footer { border-top: 1px solid var(--text-muted); padding: 4rem 0; background: var(--bg-color); transition: background 0.4s; opacity: 0.9; }
+        .footer-content { display: flex; justify-content: space-between; align-items: flex-start; }
+        .footer-left { display: flex; flex-direction: column; gap: 1rem; }
+        .copyright { font-family: var(--font-body); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+        .footer-email { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--text-main); border-bottom: 2px solid transparent; transition: border-color 0.3s; display: inline-block; text-decoration: none; padding-bottom: 2px; }
+        .footer-email:hover { border-color: var(--text-main); }
+        .social-icons { display: flex; gap: 2rem; }
+        .social-icons img { height: 24px; width: auto; opacity: 0.6; transition: opacity 0.3s; filter: var(--logo-filter); }
+        .social-icons img:hover { opacity: 1; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 900px) {
+            .container { padding: 0 2rem; }
+            .hero h1 { font-size: 4rem; }
+            .gallery { grid-template-columns: 1fr; gap: 2rem; }
+            .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
+        @media (max-width: 600px) {
+            .nav-links { display: none; }
+            .hero-container { padding: 0 1.5rem; }
+            .hero h1 { font-size: 2.8rem; }
+            #floatingPlayer { width: 92vw; right: 4vw; bottom: 20px; }
+            .footer-content { flex-direction: column; gap: 3rem; }
+            #stylePanel { width: 90%; right: 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- FONT PICKER PANEL (Refined Options) -->
+    <div id="stylePanel">
+        <div class="panel-header">
+            <span>Gothic & Modern Styles</span>
+            <span style="cursor:pointer" onclick="document.getElementById('stylePanel').classList.remove('visible')">✕</span>
+        </div>
+        <div class="font-option active" onclick="setFont('satoshi', this)">
+            <div class="font-name-display" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.04em;">Outfit + Plus Jakarta</div>
+            <div class="font-meta">Satoshi-Style Geometric</div>
+        </div>
+        <div class="font-option" onclick="setFont('modern', this)">
+            <div class="font-name-display" style="font-family: 'Manrope', sans-serif;">Manrope + Inter</div>
+            <div class="font-meta">Modern Geometric</div>
+        </div>
+        <div class="font-option" onclick="setFont('swiss', this)">
+            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Inter (All)</div>
+            <div class="font-meta">Swiss International Style</div>
+        </div>
+        <div class="font-option" onclick="setFont('bold', this)">
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Archivo + Inter</div>
+            <div class="font-meta">Bold Poster Gothic</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="branding">
+                <img src="assets/portfolio/logo_assets/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
+                <span class="brand-name">Michael Murtha</span>
+            </a>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="#work">Work</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <button class="ui-btn" id="fontToggle" aria-label="Choose Font"><span class="font-label">Aa</span></button>
+                <button class="ui-btn" id="themeToggle" aria-label="Switch Theme">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Splash Page / Hero -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-container">
+            <div class="hero-content" id="hero-content">
+                <h1>Art Director &<br>Visual Artist</h1>
+                <p>I’m a jack-of-all-trades creative who blends motion design, 3D, VFX, and real-time tools. From Cinema 4D and Houdini to Unreal, Nuke, and After Effects, I build the visuals and design the pipeline that bring ideas to life.</p>
+                <button class="play-btn" onclick="openFloatingReel('74537740')">▶ Watch Reel</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Grid -->
+    <main id="work" class="gallery-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Selected Works</h2>
+                <div class="section-title">2025</div>
+            </div>
+            <div id="gallery-grid" class="gallery"></div>
+        </div>
+    </main>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container contact-grid">
+            <div class="contact-text">
+                <h2>Get in touch</h2>
+                <p>Interested in working together? Fill out the form or send me a direct email to discuss your next project.</p>
+            </div>
+            <!-- Simple Mailto Form -->
+            <form action="mailto:mmurtha@gmail.com" method="post" enctype="text/plain" class="contact-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="container footer-content">
+            <div class="footer-left">
+                <a href="mailto:mmurtha@gmail.com" class="footer-email">mmurtha@gmail.com</a>
+                <div class="copyright">&copy; 2024 Michael Murtha</div>
+            </div>
+            <div class="social-icons">
+                <a href="https://vimeo.com/user16395134" target="_blank"><img src="assets/socialIcons/vimeo_White.png" alt="Vimeo"></a>
+                <a href="https://www.linkedin.com/in/michael-murtha-470a431/" target="_blank"><img src="assets/socialIcons/linkedin_White.png" alt="LinkedIn"></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Players & Modals -->
+    <div id="floatingPlayer">
+        <div class="floating-header"><button class="close-float" onclick="closeFloatingReel()">✕</button></div>
+        <iframe id="floatFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <div id="videoModal" class="modal">
+        <button class="close-modal" onclick="closeModal()">✕</button>
+        <div class="modal-container">
+            <div class="video-wrapper"><iframe id="vimeoPlayer" src="" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+            <div id="modalTitle"></div>
+        </div>
+    </div>
+
+    <script>
+        // 1. THEME LOGIC
+        const themeBtn = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        themeBtn.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        });
+
+        // 2. FONT LOGIC
+        const fontBtn = document.getElementById('fontToggle');
+        const stylePanel = document.getElementById('stylePanel');
+        const fontOptions = document.querySelectorAll('.font-option');
+        fontBtn.addEventListener('click', () => {
+            stylePanel.classList.toggle('visible');
+            fontBtn.classList.toggle('active');
+        });
+        function setFont(fontName, element) {
+            document.body.setAttribute('data-font', fontName);
+            fontOptions.forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // 3. DATA
+        const projects = [
+            { title: "Skeleton Crew", file: "SKELCREW.png", vimeo: "1141019603" },
+            { title: "The Flash", file: "FLASH.jpg", vimeo: "914963553" },
+            { title: "Jessica Jones", file: "JESSICAJONES.png", vimeo: "914963591" },
+            { title: "Godzilla MW", file: "GODZILLAMW.png", vimeo: "913926442" },
+            { title: "Ink", file: "INK2.jpg", vimeo: "915781397" },
+            { title: "Kung Fu Panda", file: "KFP.jpg", vimeo: "914963679" },
+            { title: "Modern Warfare 3", file: "MW3.jpg", vimeo: "914962979" },
+            { title: "Now You See Me 2", file: "NYSM2.png", vimeo: "913927393" },
+            { title: "Rampage", file: "RAMPAGEOPEN.jpg", vimeo: "914970552" },
+            { title: "She Hulk", file: "SHE_HULK_STILL.jpg", vimeo: "914963799" },
+            { title: "Zoetrope", file: "ZOETROPE.jpg", vimeo: "914963075" }
+        ];
+
+        const galleryContainer = document.getElementById('gallery-grid');
+
+        // 4. GENERATE GRID
+        projects.forEach((proj, index) => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            
+            const imagePath = `assets/thumbs/${proj.file}`;
+            
+            card.innerHTML = `
+                <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
+                <div class="card-overlay">
+                    <div class="card-title">${proj.title}</div>
+                    <div class="card-action">View Project</div>
+                </div>
+            `;
+            card.addEventListener('click', () => openModal(proj.vimeo, proj.title));
+            galleryContainer.appendChild(card);
+        });
+
+        // 5. LOAD ANIMATION
+        window.addEventListener('load', () => { document.getElementById('hero-content').classList.add('visible'); });
+
+        // 6. PLAYER LOGIC
+        const floatPlayer = document.getElementById('floatingPlayer');
+        const floatFrame = document.getElementById('floatFrame');
+        function openFloatingReel(vimeoId) {
+            closeModal();
+            floatFrame.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0&color=ffffff`;
+            floatPlayer.style.display = 'block';
+        }
+        function closeFloatingReel() { floatPlayer.style.display = 'none'; floatFrame.src = ""; }
+
+        const modal = document.getElementById('videoModal');
+        const player = document.getElementById('vimeoPlayer');
+        const titleLabel = document.getElementById('modalTitle');
+        function openModal(vimeoId, title) {
+            closeFloatingReel();
+            player.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0&color=ffffff`;
+            titleLabel.innerText = title;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() { modal.classList.remove('open'); player.src = ""; document.body.style.overflow = 'auto'; }
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    </script>
+</body>
+</html>
