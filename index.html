@@ -7,7 +7,6 @@
     <title>Michael Murtha | Art Director</title>
     
     <!-- FAVICON -->
-    <!-- FIXED: Changed PORTFOLIO to portfolio -->
     <link rel="icon" type="image/png" href="assets/portfolio/logo_assets/ICONBLACKNOBOX.png">
 
     <!-- GOOGLE FONTS LOADER -->
@@ -15,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- FONT PAIRINGS -->
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600&family=Cinzel:wght@400;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Inter:wght@300;400;500&family=Lato:wght@300;400;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;600&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Raleway:wght@300;400;600&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         /* --- 1. CORE STYLES & VARIABLES --- */
@@ -60,13 +59,11 @@
             --hero-bg-opacity: 0;
         }
 
-        /* --- FONT THEMES --- */
+        /* --- FONT THEMES (CLEAN / GOTHIC ONLY) --- */
         body[data-font="modern"] { --font-display: 'Manrope', sans-serif; --font-body: 'Inter', sans-serif; }
-        body[data-font="editorial"] { --font-display: 'Playfair Display', serif; --font-body: 'Lato', sans-serif; }
         body[data-font="tech"] { --font-display: 'Space Grotesk', sans-serif; --font-body: 'Space Mono', monospace; }
         body[data-font="swiss"] { --font-display: 'DM Sans', sans-serif; --font-body: 'DM Sans', sans-serif; }
-        body[data-font="brutalist"] { --font-display: 'Syne', sans-serif; --font-body: 'Archivo', sans-serif; }
-        body[data-font="elegant"] { --font-display: 'Cinzel', serif; --font-body: 'Raleway', sans-serif; }
+        body[data-font="bold"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -148,7 +145,6 @@
         }
         .hero-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* FIXED: Ensure path is assets/thumbs/Reel.jpg (Case sensitive!) */
             background-image: url('assets/thumbs/Reel.jpg'); 
             background-size: cover; background-position: center;
             opacity: var(--hero-bg-opacity); filter: grayscale(100%);
@@ -255,7 +251,17 @@
         .submit-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
         /* --- 7. FLOATING PLAYER & MODAL --- */
-        #floatingPlayer { position: fixed; bottom: 40px; right: 40px; width: 700px; max-width: 90vw; aspect-ratio: 16/9; background: #000; z-index: 5000; box-shadow: 0 30px 60px rgba(0,0,0,0.3); display: none; animation: slideIn 0.6s; }
+        #floatingPlayer { 
+            position: fixed; 
+            bottom: 40px; right: 40px; 
+            /* INCREASED SIZE HERE: */
+            width: 1100px; 
+            max-width: 90vw; 
+            aspect-ratio: 16/9; 
+            background: #000; z-index: 5000; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
+            display: none; animation: slideIn 0.6s; 
+        }
         @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .floating-header { position: absolute; top: -40px; right: 0; }
         .close-float { background: var(--text-main); color: var(--bg-color); border: none; width: 32px; height: 32px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
@@ -299,35 +305,27 @@
 </head>
 <body>
 
-    <!-- FONT PICKER PANEL -->
+    <!-- FONT PICKER PANEL (CLEAN GOTHIC ONLY) -->
     <div id="stylePanel">
         <div class="panel-header">
-            <span>Typography Styles</span>
+            <span>Clean & Gothic Styles</span>
             <span style="cursor:pointer" onclick="document.getElementById('stylePanel').classList.remove('visible')">✕</span>
         </div>
         <div class="font-option active" onclick="setFont('modern', this)">
             <div class="font-name-display" style="font-family: 'Manrope', sans-serif;">Manrope + Inter</div>
-            <div class="font-meta">Modern Geometric (Default)</div>
-        </div>
-        <div class="font-option" onclick="setFont('editorial', this)">
-            <div class="font-name-display" style="font-family: 'Playfair Display', serif;">Playfair + Lato</div>
-            <div class="font-meta">High-End Editorial</div>
+            <div class="font-meta">Modern Geometric</div>
         </div>
         <div class="font-option" onclick="setFont('tech', this)">
-            <div class="font-name-display" style="font-family: 'Space Grotesk', sans-serif;">Space Grotesk + Mono</div>
-            <div class="font-meta">Tech / Digital / Code</div>
+            <div class="font-name-display" style="font-family: 'Space Grotesk', sans-serif;">Space Grotesk</div>
+            <div class="font-meta">Technical Gothic</div>
+        </div>
+        <div class="font-option" onclick="setFont('bold', this)">
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Archivo + Inter</div>
+            <div class="font-meta">Bold American Gothic</div>
         </div>
         <div class="font-option" onclick="setFont('swiss', this)">
             <div class="font-name-display" style="font-family: 'DM Sans', sans-serif;">DM Sans</div>
-            <div class="font-meta">Swiss International Style</div>
-        </div>
-        <div class="font-option" onclick="setFont('brutalist', this)">
-            <div class="font-name-display" style="font-family: 'Syne', sans-serif;">Syne + Archivo</div>
-            <div class="font-meta">Art Brutalism</div>
-        </div>
-        <div class="font-option" onclick="setFont('elegant', this)">
-            <div class="font-name-display" style="font-family: 'Cinzel', serif;">Cinzel + Raleway</div>
-            <div class="font-meta">Elegant & Cinematic</div>
+            <div class="font-meta">Swiss International</div>
         </div>
     </div>
 
@@ -335,7 +333,6 @@
     <header>
         <div class="container nav-container">
             <a href="#" class="branding">
-                <!-- FIXED: Changed PORTFOLIO to portfolio -->
                 <img src="assets/portfolio/logo_assets/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
                 <span class="brand-name">Michael Murtha</span>
             </a>
@@ -379,7 +376,7 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Selected Works</h2>
-                <div class="section-title">2023 — 2024</div>
+                <div class="section-title">2025</div>
             </div>
             <div id="gallery-grid" class="gallery"></div>
         </div>
@@ -416,7 +413,6 @@
                 <div class="copyright">&copy; 2024 Michael Murtha</div>
             </div>
             <div class="social-icons">
-                <!-- FIXED: Changed SocialIcons to socialIcons -->
                 <a href="https://vimeo.com/user16395134" target="_blank"><img src="assets/socialIcons/vimeo_White.png" alt="Vimeo"></a>
                 <a href="https://www.linkedin.com/in/michael-murtha-470a431/" target="_blank"><img src="assets/socialIcons/linkedin_White.png" alt="LinkedIn"></a>
             </div>
@@ -471,8 +467,7 @@
             { title: "Modern Warfare 3", file: "MW3.jpg", vimeo: "914962979" },
             { title: "Now You See Me 2", file: "NYSM2.png", vimeo: "913927393" },
             { title: "Rampage", file: "RAMPAGEOPEN.jpg", vimeo: "914970552" },
-            // Handle the space in She Hulk filename using URI encoding, though renaming the file is safer
-            { title: "She Hulk", file: "SHE%20HULK_STILL.jpg", vimeo: "914963799" },
+            { title: "She Hulk", file: "SHE_HULK_STILL.jpg", vimeo: "914963799" },
             { title: "Zoetrope", file: "ZOETROPE.jpg", vimeo: "914963075" }
         ];
 
@@ -483,7 +478,6 @@
             const card = document.createElement('div');
             card.className = 'project-card';
             
-            // Fixed path logic to ensure assets/thumbs/ is lowercase
             const imagePath = `assets/thumbs/${proj.file}`;
             
             card.innerHTML = `
