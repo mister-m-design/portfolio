@@ -13,8 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- FONT PAIRINGS -->
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Raleway:wght@300;400;600&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- REFINED FONT LIST (Clean, Gothic, Sans-Serif Only) -->
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
         /* --- 1. CORE STYLES & VARIABLES --- */
@@ -59,11 +59,19 @@
             --hero-bg-opacity: 0;
         }
 
-        /* --- FONT THEMES (CLEAN / GOTHIC ONLY) --- */
+        /* --- REFINED FONT THEMES --- */
+        
+        /* 1. Modern: Manrope (Headlines) + Inter (Body) */
         body[data-font="modern"] { --font-display: 'Manrope', sans-serif; --font-body: 'Inter', sans-serif; }
-        body[data-font="tech"] { --font-display: 'Space Grotesk', sans-serif; --font-body: 'Space Mono', monospace; }
+        
+        /* 2. Neo-Grotesk: Space Grotesk (Headlines) + DM Sans (Body) */
+        body[data-font="grotesk"] { --font-display: 'Space Grotesk', sans-serif; --font-body: 'DM Sans', sans-serif; }
+        
+        /* 3. Swiss International: DM Sans (Headlines) + DM Sans (Body) */
         body[data-font="swiss"] { --font-display: 'DM Sans', sans-serif; --font-body: 'DM Sans', sans-serif; }
-        body[data-font="bold"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; }
+        
+        /* 4. Bold Gothic: Archivo Black (Headlines) + Work Sans (Body) */
+        body[data-font="bold"] { --font-display: 'Archivo', sans-serif; --font-body: 'Work Sans', sans-serif; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -252,15 +260,11 @@
 
         /* --- 7. FLOATING PLAYER & MODAL --- */
         #floatingPlayer { 
-            position: fixed; 
-            bottom: 40px; right: 40px; 
-            /* INCREASED SIZE HERE: */
-            width: 1100px; 
-            max-width: 90vw; 
-            aspect-ratio: 16/9; 
+            position: fixed; bottom: 40px; right: 40px; 
+            /* CINEMATIC SIZE */
+            width: 1100px; max-width: 90vw; aspect-ratio: 16/9; 
             background: #000; z-index: 5000; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
-            display: none; animation: slideIn 0.6s; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3); display: none; animation: slideIn 0.6s; 
         }
         @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .floating-header { position: absolute; top: -40px; right: 0; }
@@ -305,7 +309,7 @@
 </head>
 <body>
 
-    <!-- FONT PICKER PANEL (CLEAN GOTHIC ONLY) -->
+    <!-- FONT PICKER PANEL (Refined Options) -->
     <div id="stylePanel">
         <div class="panel-header">
             <span>Clean & Gothic Styles</span>
@@ -315,13 +319,13 @@
             <div class="font-name-display" style="font-family: 'Manrope', sans-serif;">Manrope + Inter</div>
             <div class="font-meta">Modern Geometric</div>
         </div>
-        <div class="font-option" onclick="setFont('tech', this)">
-            <div class="font-name-display" style="font-family: 'Space Grotesk', sans-serif;">Space Grotesk</div>
-            <div class="font-meta">Technical Gothic</div>
+        <div class="font-option" onclick="setFont('grotesk', this)">
+            <div class="font-name-display" style="font-family: 'Space Grotesk', sans-serif;">Space Grotesk + DM Sans</div>
+            <div class="font-meta">Digital Neo-Grotesk</div>
         </div>
         <div class="font-option" onclick="setFont('bold', this)">
-            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Archivo + Inter</div>
-            <div class="font-meta">Bold American Gothic</div>
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Archivo + Work Sans</div>
+            <div class="font-meta">Bold Poster Gothic</div>
         </div>
         <div class="font-option" onclick="setFont('swiss', this)">
             <div class="font-name-display" style="font-family: 'DM Sans', sans-serif;">DM Sans</div>
@@ -376,6 +380,7 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Selected Works</h2>
+                <!-- UPDATED DATE -->
                 <div class="section-title">2025</div>
             </div>
             <div id="gallery-grid" class="gallery"></div>
