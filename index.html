@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Michael Murtha - Art Director & Creative Strategist">
+    <title>Michael Murtha | Art Director</title>
+    
+    <!-- Using Helvetica Neue / Inter for that classic Art Director look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. CORE VARIABLES & RESET --- */
+        :root {
+            --bg-color: #080808;       /* Deep matte black */
+            --card-bg: #111111;
+            --text-main: #f0f0f0;      /* Off-white for better readability */
+            --text-muted: #888888;
+            --accent: #ffffff; 
+            --font-main: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --header-height: 90px;
+            --container-width: 1400px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
+        a:hover { opacity: 0.6; }
+        ul { list-style: none; }
+        img { width: 100%; display: block; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+        /* --- 2. LAYOUT UTILITIES --- */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+
+        /* Scroll Reveal Animation Class */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* --- 3. NAVIGATION --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: rgba(8, 8, 8, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .desktop-nav { display: flex; gap: 3rem; }
+        .desktop-nav li a {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .desktop-nav li a:hover, .desktop-nav li a.active {
+            color: var(--text-main);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle { display: none; flex-direction: column; gap: 6px; }
+        .menu-toggle span { width: 24px; height: 2px; background: white; }
+
+        /* --- 4. HERO SECTION --- */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: var(--header-height);
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 6vw, 6rem);
+            line-height: 1.05;
+            font-weight: 400; /* Lighter weight for Art Director elegance */
+            letter-spacing: -0.02em;
+            max-width: 1000px;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 550px;
+            font-weight: 300;
+        }
+
+        /* --- 5. FILTER BAR --- */
+        .filter-container {
+            padding: 2rem 0 4rem 0;
+            position: sticky;
+            top: var(--header-height);
+            background: var(--bg-color);
+            z-index: 900;
+            display: flex;
+            gap: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .filter-btn {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+            white-space: nowrap;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            color: var(--text-main);
+            /* Underline effect for active state */
+            border-bottom: 1px solid white; 
+        }
+
+        /* --- 6. ADVANCED GRID --- */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default 2 columns for AD look */
+            gap: 2rem;
+            padding-bottom: 8rem;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        /* Make some items span 2 columns for variety if needed, currently uniform */
+        .project-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s;
+            opacity: 0.9;
+            filter: grayscale(20%); /* Artistic touch */
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover img {
+            transform: scale(1.03);
+            opacity: 1;
+            filter: grayscale(0%);
+        }
+
+        .project-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transform: translateY(10px);
+            transition: transform 0.4s;
+        }
+        
+        .project-card:hover .card-title {
+            transform: translateY(0);
+        }
+
+        .card-tags {
+            font-size: 0.8rem;
+            color: #ddd;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 1rem;
+        }
+
+        /* --- 7. MODAL (LIGHTBOX) --- */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #080808;
+            z-index: 2000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            overflow-y: auto;
+        }
+
+        .modal.open { display: block; opacity: 1; }
+
+        .modal-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .close-modal {
+            position: fixed;
+            top: 2rem; right: 3rem;
+            color: white;
+            font-size: 2rem;
+            z-index: 2001;
+            mix-blend-mode: difference; /* Ensures visibility on any background */
+        }
+
+        .modal-hero-img {
+            width: 100%;
+            height: 60vh;
+            object-fit: cover;
+            margin-bottom: 3rem;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .modal-header h2 { font-size: 3rem; font-weight: 400; line-height: 1; }
+        .modal-meta { text-align: right; color: var(--text-muted); font-size: 0.9rem; }
+
+        .modal-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ccc;
+            max-width: 800px;
+        }
+
+        /* --- 8. ABOUT & CONTACT --- */
+        .about-section {
+            border-top: 1px solid #222;
+            padding: 6rem 0;
+        }
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #444;
+            padding: 1rem 0;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: white;
+        }
+
+        .submit-btn {
+            margin-top: 1rem;
+            font-size: 2rem;
+            color: white;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .submit-btn:hover { opacity: 1; }
+
+        /* --- 9. FOOTER --- */
+        footer {
+            padding: 3rem 0;
+            border-top: 1px solid #222;
+            color: #444;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .hero-content h1 { font-size: 3.5rem; }
+            .gallery { grid-template-columns: 1fr; }
+            .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .container { padding: 0 1.5rem; }
+            
+            .menu-toggle { display: flex; }
+            .desktop-nav {
+                display: none;
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                width: 100%;
+                background: #080808;
+                flex-direction: column;
+                padding: 2rem;
+                gap: 2rem;
+                border-bottom: 1px solid #333;
+            }
+            .desktop-nav.active { display: flex; }
+            .modal-header { display: block; }
+            .modal-meta { text-align: left; margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo">Michael Murtha</a>
+            <button class="menu-toggle" aria-label="Toggle Navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <nav>
+                <ul class="desktop-nav">
+                    <li><a href="#work" class="active">Selected Work</a></li>
+                    <li><a href="#about">Profile</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero container fade-in-section">
+            <div class="hero-content">
+                <h1>Art Direction &<br>Visual Strategy</h1>
+                <p>Building cohesive brand systems and compelling visual narratives for global campaigns. Based in Los Angeles.</p>
+            </div>
+        </section>
+
+        <!-- FILTERS -->
+        <div class="container" id="work">
+            <div class="filter-container">
+                <button class="filter-btn active" data-filter="all">All Work</button>
+                <button class="filter-btn" data-filter="campaigns">Campaigns</button>
+                <button class="filter-btn" data-filter="branding">Branding</button>
+                <button class="filter-btn" data-filter="digital">Digital</button>
+            </div>
+        </div>
+
+        <!-- GALLERY -->
+        <section class="gallery container">
+            
+            <!-- Project 1: Campaign -->
+            <div class="project-card fade-in-section" data-category="campaigns" onclick="openModal('Kinetics S/S 24', 'Global Campaign', 'Art Direction for the Spring/Summer 24 collection. We focused on the interplay between light and movement to highlight the fabric technology.', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2670&auto=format&fit=crop')">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2670&auto=format&fit=crop" alt="Fashion Campaign">
+                <div class="card-overlay">
+                    <h3 class="card-title">Kinetics S/S 24</h3>
+                    <div class="card-tags">Global Campaign</div>
+                </div>
+            </div>
+
+            <!-- Project 2: Branding -->
+            <div class="project-card fade-in-section" data-category="branding" onclick="openModal('Aura Identity', 'Brand System', 'Complete visual identity overhaul for a luxury wellness brand. Deliverables included logo design, packaging, and digital style guides.', 'https://images.unsplash.com/photo-1590845947670-c009801ffa74?q=80&w=2659&auto=format&fit=crop')">
+                <img src="https://images.unsplash.com/photo-1590845947670-c009801ffa74?q=80&w=2659&auto=format&fit=crop" alt="Minimalist Branding">
+                <div class="card-overlay">
+                    <h3 class="card-title">Aura Identity</h3>
+                    <div class="card-tags">Brand System</div>
+                </div>
+            </div>
+
+            <!-- Project 3: Digital -->
+            <div class="project-card fade-in-section" data-category="digital" onclick="openModal('Neo-Bank App', 'UI/UX Direction', 'Led the design team in creating a user-centric banking interface. Focused on dark mode aesthetics and simplified user flows.', 'https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=2670&auto=format&fit=crop')">
+                <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=2670&auto=format&fit=crop" alt="App Interface">
+                <div class="card-overlay">
+                    <h3 class="card-title">Neo-Bank App</h3>
+                    <div class="card-tags">UI/UX Direction</div>
+                </div>
+            </div>
+
+            <!-- Project 4: Campaigns -->
+            <div class="project-card fade-in-section" data-category="campaigns" onclick="openModal('Echo Magazine', 'Editorial Design', 'Creative direction for the 10th anniversary issue. Managed typography, photography selection, and layout grids.', 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2670&auto=format&fit=crop')">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" alt="Editorial Layout">
+                <div class="card-overlay">
+                    <h3 class="card-title">Echo Magazine</h3>
+                    <div class="card-tags">Editorial Design</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="container about-section fade-in-section">
+            <div class="about-grid">
+                <div>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 400;">Profile</h2>
+                    <p style="color: #ccc; font-size: 1.1rem; margin-bottom: 2rem;">
+                        Michael Murtha is a multidisciplinary Art Director with over 8 years of experience in the creative industry. His work bridges the gap between strategic thinking and impeccable visual execution.
+                    </p>
+                    <p style="color: #ccc; font-size: 1.1rem;">
+                        He specializes in leading creative teams, conceptualizing 360° campaigns, and developing robust brand identities that stand the test of time.
+                    </p>
+                </div>
+
+                <div id="contact">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 400;">Contact</h2>
+                    <form onsubmit="event.preventDefault(); alert('Message Sent!');">
+                        <div class="form-group">
+                            <input type="text" placeholder="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea rows="4" placeholder="Inquiry" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">→</button>
+                    </form>
+                    <div style="margin-top: 3rem; color: #666;">
+                        <p>michael.murtha@example.com</p>
+                        <p>+1 (555) 010-9999</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        <div>&copy; 2024 Michael Murtha</div>
+        <div>
+            <a href="#">LinkedIn</a> &nbsp;&nbsp;
+            <a href="#">Instagram</a> &nbsp;&nbsp;
+            <a href="#">Behance</a>
+        </div>
+    </footer>
+
+    <!-- DYNAMIC MODAL -->
+    <div id="projectModal" class="modal">
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <div class="modal-content">
+            <img id="modalImg" src="" class="modal-hero-img" alt="Project Detail">
+            
+            <div class="modal-header">
+                <h2 id="modalTitle">Project Title</h2>
+                <div class="modal-meta">
+                    <span id="modalCategory">CATEGORY</span><br>
+                    <span>Art Direction / Concept</span>
+                </div>
+            </div>
+            
+            <div class="modal-body">
+                <p id="modalDesc">Description text...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // 1. FILTERING
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projects = document.querySelectorAll('.project-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filterValue = btn.getAttribute('data-filter');
+
+                projects.forEach(project => {
+                    if (filterValue === 'all' || project.getAttribute('data-category') === filterValue) {
+                        project.style.display = 'block';
+                    } else {
+                        project.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 2. MODAL SYSTEM
+        const modal = document.getElementById('projectModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCat = document.getElementById('modalCategory');
+        const modalDesc = document.getElementById('modalDesc');
+
+        function openModal(title, category, desc, imgSrc) {
+            modalTitle.textContent = title;
+            modalCat.textContent = category;
+            modalDesc.textContent = desc;
+            modalImg.src = imgSrc;
+            
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('open'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+            setTimeout(() => modal.style.display = 'none', 400);
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // 3. SCROLL REVEAL
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 4. MOBILE MENU
+        document.querySelector('.menu-toggle').addEventListener('click', () => {
+            document.querySelector('.desktop-nav').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
