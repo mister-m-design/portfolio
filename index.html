@@ -7,7 +7,8 @@
     <title>Michael Murtha | Art Director</title>
     
     <!-- FAVICON -->
-    <link rel="icon" type="image/png" href="_ASSETS/PORTFOLIO/_LOGO_ASSETS/ICONBLACKNOBOX.png">
+    <!-- UPDATED PATH: assets/PORTFOLIO/logo_assets/ -->
+    <link rel="icon" type="image/png" href="assets/PORTFOLIO/logo_assets/ICONBLACKNOBOX.png">
 
     <!-- GOOGLE FONTS LOADER -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,7 +148,8 @@
         }
         .hero-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('_ASSETS/THUMBS/Reel.jpg'); 
+            /* UPDATED PATH: assets/thumbs/ */
+            background-image: url('assets/thumbs/Reel.jpg'); 
             background-size: cover; background-position: center;
             opacity: var(--hero-bg-opacity); filter: grayscale(100%);
             transition: opacity 0.5s ease; z-index: 0;
@@ -333,7 +335,8 @@
     <header>
         <div class="container nav-container">
             <a href="#" class="branding">
-                <img src="_ASSETS/PORTFOLIO/_LOGO_ASSETS/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
+                <!-- UPDATED PATH: assets/PORTFOLIO/logo_assets/ -->
+                <img src="assets/PORTFOLIO/logo_assets/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
                 <span class="brand-name">Michael Murtha</span>
             </a>
             <div class="nav-right">
@@ -413,8 +416,9 @@
                 <div class="copyright">&copy; 2024 Michael Murtha</div>
             </div>
             <div class="social-icons">
-                <a href="https://vimeo.com/user16395134" target="_blank"><img src="_ASSETS/SocialIcons/vimeo_White.png" alt="Vimeo"></a>
-                <a href="https://www.linkedin.com/in/michael-murtha-470a431/" target="_blank"><img src="_ASSETS/SocialIcons/linkedin_White.png" alt="LinkedIn"></a>
+                <!-- UPDATED PATHS: assets/SocialIcons/ -->
+                <a href="https://vimeo.com/user16395134" target="_blank"><img src="assets/SocialIcons/vimeo_White.png" alt="Vimeo"></a>
+                <a href="https://www.linkedin.com/in/michael-murtha-470a431/" target="_blank"><img src="assets/SocialIcons/linkedin_White.png" alt="LinkedIn"></a>
             </div>
         </div>
     </footer>
@@ -477,7 +481,10 @@
         projects.forEach((proj, index) => {
             const card = document.createElement('div');
             card.className = 'project-card';
-            const imagePath = `_ASSETS/THUMBS/${proj.file}`;
+            
+            // UPDATED PATH: assets/thumbs/
+            const imagePath = `assets/thumbs/${proj.file}`;
+            
             card.innerHTML = `
                 <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
                 <div class="card-overlay">
