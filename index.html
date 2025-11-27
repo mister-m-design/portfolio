@@ -35,7 +35,7 @@
             --hero-bg-opacity: 0.15;
             
             /* --- DEFAULT FONTS (INTER DISPLAY) --- */
-            --font-display: 'Inter', sans-serif;
+            --font-display: 'Archivo', sans-serif;
             --font-body: 'Inter', sans-serif;
             
             /* KERNING: THE SWEET SPOT */
@@ -67,7 +67,7 @@
 
         /* 1. Inter Display (Default) */
         body[data-font="inter"] { 
-            --font-display: 'Inter', sans-serif; 
+            --font-display: 'Archivo', sans-serif;
             --font-body: 'Inter', sans-serif; 
             --tracking-display: 0.025em; 
         }
@@ -102,7 +102,7 @@
         
         /* 6. Bold Gothic (Archivo) */
         body[data-font="gothic"] { 
-            --font-display: 'Archivo', sans-serif; 
+            --font-display: 'Inter', sans-serif; 
             --font-body: 'Inter', sans-serif; 
             --tracking-display: 0.025em; 
         }
@@ -462,7 +462,7 @@
         </div>
         <!-- DEFAULT IS INTER -->
         <div class="font-option active" onclick="setFont('inter', this)">
-            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Inter Display</div>
+            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Archivo + Inter</div>
             <div class="font-meta">Swiss International Style</div>
         </div>
         <div class="font-option" onclick="setFont('outfit', this)">
@@ -482,7 +482,7 @@
             <div class="font-meta">Design Studio Clean</div>
         </div>
         <div class="font-option" onclick="setFont('gothic', this)">
-            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Archivo + Inter</div>
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Inter Display</div>
             <div class="font-meta">Bold American Gothic</div>
         </div>
     </div>
