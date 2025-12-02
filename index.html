@@ -35,11 +35,11 @@
             --hero-bg-opacity: 0.15;
             
             /* --- DEFAULT FONTS (INTER DISPLAY) --- */
-            --font-display: 'Archivo', sans-serif;
+            --font-display: 'Inter', sans-serif;
             --font-body: 'Inter', sans-serif;
             
-            /* KERNING: THE SWEET SPOT */
-            --tracking-display: -0.015em; /* The perfect modern headline tightness */
+            /* KERNING SETTINGS */
+            --tracking-display: -0.025em; 
             --tracking-body: 0em;         
             
             --header-height: 100px;
@@ -63,49 +63,13 @@
             --hero-bg-opacity: 0;
         }
 
-        /* --- FONT THEMES (Unified Tracking) --- */
-
-        /* 1. Inter Display (Default) */
-        body[data-font="inter"] { 
-            --font-display: 'Archivo', sans-serif;
-            --font-body: 'Inter', sans-serif; 
-            --tracking-display: 0.025em; 
-        }
-        
-        /* 2. Outfit (Satoshi Style) */
-        body[data-font="outfit"] { 
-            --font-display: 'Outfit', sans-serif; 
-            --font-body: 'Plus Jakarta Sans', sans-serif; 
-            --tracking-display: 0.025em; 
-        }
-
-        /* 3. Modern Geometric */
-        body[data-font="modern"] { 
-            --font-display: 'Manrope', sans-serif; 
-            --font-body: 'Inter', sans-serif; 
-            --tracking-display: 0.025em; 
-        }
-        
-        /* 4. Swiss (DM Sans) */
-        body[data-font="swiss"] { 
-            --font-display: 'DM Sans', sans-serif; 
-            --font-body: 'DM Sans', sans-serif; 
-            --tracking-display: 0.025em; 
-        }
-
-        /* 5. Studio (Work Sans) */
-        body[data-font="studio"] { 
-            --font-display: 'Work Sans', sans-serif; 
-            --font-body: 'Work Sans', sans-serif; 
-            --tracking-display: 0.03em; /* Work Sans handles tightness well */
-        }
-        
-        /* 6. Bold Gothic (Archivo) */
-        body[data-font="gothic"] { 
-            --font-display: 'Inter', sans-serif; 
-            --font-body: 'Inter', sans-serif; 
-            --tracking-display: 0.025em; 
-        }
+        /* --- FONT THEMES --- */
+        body[data-font="inter"] { --font-display: 'Inter', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.025em; }
+        body[data-font="outfit"] { --font-display: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif; --tracking-display: -0.01em; }
+        body[data-font="modern"] { --font-display: 'Manrope', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
+        body[data-font="swiss"] { --font-display: 'DM Sans', sans-serif; --font-body: 'DM Sans', sans-serif; --tracking-display: -0.015em; }
+        body[data-font="studio"] { --font-display: 'Work Sans', sans-serif; --font-body: 'Work Sans', sans-serif; --tracking-display: -0.02em; }
+        body[data-font="gothic"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -168,7 +132,6 @@
             font-family: var(--font-display); 
             font-weight: 800; 
             font-size: 1.1rem; 
-            /* NAME IS CAPITALIZED HERE */
             text-transform: uppercase; 
             letter-spacing: var(--tracking-display); 
             color: var(--text-main); 
@@ -462,7 +425,7 @@
         </div>
         <!-- DEFAULT IS INTER -->
         <div class="font-option active" onclick="setFont('inter', this)">
-            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Archivo + Inter</div>
+            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Inter Display</div>
             <div class="font-meta">Swiss International Style</div>
         </div>
         <div class="font-option" onclick="setFont('outfit', this)">
@@ -482,7 +445,7 @@
             <div class="font-meta">Design Studio Clean</div>
         </div>
         <div class="font-option" onclick="setFont('gothic', this)">
-            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Inter Display</div>
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Bold Gothic</div>
             <div class="font-meta">Bold American Gothic</div>
         </div>
     </div>
@@ -623,37 +586,99 @@
             element.classList.add('active');
         }
 
-        // 3. PROJECT DATA
+        // 3. PROJECT DATA (MAPPED TO FOLDER STRUCTURE)
         const projects = [
             { 
                 title: "Skeleton Crew", 
                 file: "SKELCREW.png", 
                 vimeo: "1141019603",
-                description: "Lead Motion Designer for this project. Focused on creating a gritty, textured look that matches the show's aesthetic. Used Cinema 4D and Redshift for the primary 3D elements.",
-                frames: ["SKELCREW.png", "SKELCREW.png", "SKELCREW.png"] 
+                description: "Lead Motion Designer for this project. Focused on creating a gritty, textured look that matches the show's aesthetic.",
+                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"] 
             },
             { 
                 title: "The Flash", 
                 file: "FLASH.jpg", 
                 vimeo: "914963553",
-                description: "VFX Supervisor for the speed force sequences. The goal was to visualize speed in a way that felt physical and electric, moving away from traditional motion blur.",
-                frames: ["FLASH.jpg", "FLASH.jpg", "FLASH.jpg"]
+                description: "VFX Supervisor for the speed force sequences. Visualizing speed with electric, physical energy.",
+                frames: ["assets/stills/flash/flash1.png", "assets/stills/flash/flash2.png", "assets/stills/flash/flash3.png"]
             },
             { 
                 title: "Jessica Jones", 
                 file: "JESSICAJONES.png", 
                 vimeo: "914963591",
-                description: "Title sequence design inspired by noir detective comics and watercolor aesthetics. I developed a custom shader pipeline in After Effects to achieve the painted look.",
-                frames: ["JESSICAJONES.png", "JESSICAJONES.png", "JESSICAJONES.png"]
+                description: "Title sequence design inspired by noir detective comics and watercolor aesthetics.",
+                frames: ["assets/stills/jessicajones/jj01.png", "assets/stills/jessicajones/jj02.png", "assets/stills/jessicajones/jj03.png"]
             },
-            { title: "Godzilla MW", file: "GODZILLAMW.png", vimeo: "913926442", description: "Design and animation for the Monsterverse integration. Heavy simulation work in Houdini for destruction elements.", frames: ["GODZILLAMW.png", "GODZILLAMW.png"] },
-            { title: "Ink", file: "INK2.jpg", vimeo: "915781397", description: "A personal exploration of fluid dynamics and ink in water, simulated entirely in 3D using X-Particles.", frames: ["INK2.jpg", "INK2.jpg"] },
-            { title: "Kung Fu Panda", file: "KFP.jpg", vimeo: "914963679", description: "DreamWorks promotional package. Playful, energetic motion graphics that adhere strictly to the brand guidelines.", frames: ["KFP.jpg", "KFP.jpg"] },
-            { title: "Modern Warfare 3", file: "MW3.jpg", vimeo: "914962979", description: "UI and HUD design for in-game cinematics. Focused on a tactical, military-tech aesthetic.", frames: ["MW3.jpg", "MW3.jpg"] },
-            { title: "Now You See Me 2", file: "NYSM2.png", vimeo: "913927393", description: "Visual effects for the card throwing sequences. A mix of practical footage and 3D card replacements.", frames: ["NYSM2.png", "NYSM2.png"] },
-            { title: "Rampage", file: "RAMPAGEOPEN.jpg", vimeo: "914970552", description: "Main title design featuring genetic mutation motifs and aggressive typography.", frames: ["RAMPAGEOPEN.jpg", "RAMPAGEOPEN.jpg"] },
-            { title: "She Hulk", file: "SHE_HULK_STILL.jpg", vimeo: "914963799", description: "Legal drama meets superhero action. Designed the courtroom graphics and lower thirds.", frames: ["SHE_HULK_STILL.jpg", "SHE_HULK_STILL.jpg"] },
-            { title: "Zoetrope", file: "ZOETROPE.jpg", vimeo: "914963075", description: "Experimental short film exploring the history of animation devices through a modern lens.", frames: ["ZOETROPE.jpg", "ZOETROPE.jpg"] }
+            { 
+                title: "Godzilla MW", 
+                file: "GODZILLAMW.png", 
+                vimeo: "913926442", 
+                description: "Design and animation for the Monsterverse integration. Heavy simulation work in Houdini.", 
+                frames: ["assets/stills/godzilla/gdzl01.png", "assets/stills/godzilla/gdzl02.png", "assets/stills/godzilla/gdzl03.png", "assets/stills/godzilla/gdzl04.png"] 
+            },
+            { 
+                title: "Ink", 
+                file: "INK2.jpg", 
+                vimeo: "915781397", 
+                description: "A personal exploration of fluid dynamics and ink in water, simulated entirely in 3D.", 
+                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"] 
+            },
+            { 
+                title: "Kung Fu Panda", 
+                file: "KFP.jpg", 
+                vimeo: "914963679", 
+                description: "DreamWorks promotional package. Playful, energetic motion graphics.", 
+                frames: [] // No stills folder in screenshot
+            },
+            { 
+                title: "Modern Warfare 3", 
+                file: "MW3.jpg", 
+                vimeo: "914962979", 
+                description: "UI and HUD design for in-game cinematics. Focused on a tactical, military-tech aesthetic.", 
+                frames: ["assets/stills/mw3/mwthree1.png", "assets/stills/mw3/mwthree2.png", "assets/stills/mw3/mwthree3.png"] 
+            },
+            { 
+                title: "Now You See Me 2", 
+                file: "NYSM2.png", 
+                vimeo: "913927393", 
+                description: "Visual effects for the card throwing sequences.", 
+                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"] 
+            },
+            { 
+                title: "Rampage", 
+                file: "RAMPAGEOPEN.jpg", 
+                vimeo: "914970552", 
+                description: "Main title design featuring genetic mutation motifs.", 
+                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"] 
+            },
+            { 
+                title: "She Hulk", 
+                file: "SHE_HULK_STILL.jpg", 
+                vimeo: "914963799", 
+                description: "Courtroom graphics and lower thirds design.", 
+                frames: ["assets/stills/shehulk/she1.png", "assets/stills/shehulk/she2.png", "assets/stills/shehulk/she3.png"] 
+            },
+            { 
+                title: "Zoetrope", 
+                file: "ZOETROPE.jpg", 
+                vimeo: "914963075", 
+                description: "Experimental short film exploring animation history.", 
+                frames: ["assets/stills/zoetrope/zoe1.png", "assets/stills/zoetrope/zoe2.png"] 
+            },
+            {
+                title: "Wicked",
+                file: "assets/stills/wicked/wicked1.png", // Using still as thumb since no thumb in assets/thumbs
+                vimeo: "1141019603", // Placeholder ID
+                description: "Magical atmosphere and particle effects design.",
+                frames: ["assets/stills/wicked/wicked1.png", "assets/stills/wicked/wicked2.png", "assets/stills/wicked/wicked3.png"]
+            },
+            {
+                title: "Furiosa",
+                file: "assets/stills/furiosa/furiosa1.png", // Using still as thumb
+                vimeo: "1141019603", // Placeholder ID
+                description: "High-octane visual development.",
+                frames: ["assets/stills/furiosa/furiosa1.png", "assets/stills/furiosa/furiosa2.png", "assets/stills/furiosa/furiosa3.png"]
+            }
         ];
 
         const galleryContainer = document.getElementById('gallery-grid');
@@ -662,7 +687,14 @@
         projects.forEach((proj, index) => {
             const card = document.createElement('div');
             card.className = 'project-card';
-            const imagePath = `assets/thumbs/${proj.file}`;
+            
+            // Check if file path is full path or just filename
+            let imagePath;
+            if (proj.file.includes('/')) {
+                imagePath = proj.file;
+            } else {
+                imagePath = `assets/thumbs/${proj.file}`;
+            }
             
             card.innerHTML = `
                 <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
@@ -703,10 +735,10 @@
 
             framesGrid.innerHTML = ''; 
             if(project.frames && project.frames.length > 0) {
-                project.frames.forEach(frameFile => {
+                project.frames.forEach(framePath => {
                     const img = document.createElement('img');
                     img.className = 'style-frame';
-                    img.src = `assets/thumbs/${frameFile}`; 
+                    img.src = framePath; 
                     framesGrid.appendChild(img);
                 });
             }
