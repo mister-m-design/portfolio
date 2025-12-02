@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portfolio of Michael Rush Murtha - Art Director">
-    <title>Michael Rush Murtha | Art Director v1</title>
+    <title>Michael Rush Murtha | Art Director</title>
     
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="assets/portfolio/logo_assets/ICONBLACKNOBOX.png">
@@ -19,27 +19,24 @@
     <style>
         /* --- 1. CORE STYLES & VARIABLES --- */
         :root {
-            /* Default Dark Theme */
             --bg-color: #050505;
             --card-bg: #111111;
             --text-main: #ffffff;
             --text-muted: #888888;
             --header-gradient: linear-gradient(to bottom, rgba(5,5,5,0.95), rgba(5,5,5,0.0));
-            
             --btn-bg: #ffffff;
             --btn-text: #000000;
             --input-bg: #1a1a1a;
             --input-border: #333333;
-            
             --icon-filter: invert(0); 
             --hero-bg-opacity: 0.15;
             
-            /* --- DEFAULT FONTS (INTER DISPLAY) --- */
-            --font-display: 'Inter', sans-serif;
+            /* DEFAULT FONTS (BOLD GOTHIC) */
+            --font-display: 'Archivo', sans-serif;
             --font-body: 'Inter', sans-serif;
             
             /* KERNING SETTINGS */
-            --tracking-display: -0.025em; 
+            --tracking-display: -0.01em; 
             --tracking-body: 0em;         
             
             --header-height: 100px;
@@ -53,23 +50,21 @@
             --text-main: #000000;
             --text-muted: #555555;
             --header-gradient: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.0));
-            
             --btn-bg: #000000;
             --btn-text: #ffffff;
             --input-bg: #f0f0f0;
             --input-border: #e0e0e0;
-            
             --icon-filter: invert(1);
             --hero-bg-opacity: 0;
         }
 
         /* --- FONT THEMES --- */
+        body[data-font="gothic"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
         body[data-font="inter"] { --font-display: 'Inter', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.025em; }
         body[data-font="outfit"] { --font-display: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif; --tracking-display: -0.01em; }
         body[data-font="modern"] { --font-display: 'Manrope', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
         body[data-font="swiss"] { --font-display: 'DM Sans', sans-serif; --font-body: 'DM Sans', sans-serif; --tracking-display: -0.015em; }
         body[data-font="studio"] { --font-display: 'Work Sans', sans-serif; --font-body: 'Work Sans', sans-serif; --tracking-display: -0.02em; }
-        body[data-font="gothic"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -167,10 +162,9 @@
         }
         .hero-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('assets/thumbs/Reel.jpg'); 
-            background-size: cover; background-position: center;
-            opacity: var(--hero-bg-opacity); filter: grayscale(100%);
-            transition: opacity 0.5s ease; z-index: 0;
+            /* BACKGROUND IMAGE REMOVED */
+            background: transparent;
+            z-index: 0;
         }
         .hero-container { position: relative; z-index: 2; width: 100%; max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
         .hero-content { max-width: 900px; opacity: 0; transform: translateY(30px); transition: opacity 1s, transform 1s; }
@@ -343,10 +337,18 @@
             font-family: var(--font-display); 
         }
 
+        /* DYNAMIC VIDEO CONTAINER */
+        #videoContainer {
+            width: 100%;
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
         .video-wrapper { 
             width: 100%; aspect-ratio: 16/9; background: #000; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
-            margin-bottom: 3rem;
         }
         iframe { width: 100%; height: 100%; border: none; }
 
@@ -382,9 +384,28 @@
         .style-frame {
             width: 100%; height: auto; border-radius: 4px;
             background: var(--card-bg);
+            cursor: zoom-in;
+            transition: transform 0.2s;
+        }
+        
+        .style-frame:hover { transform: scale(1.01); }
+
+        /* --- 9. LIGHTBOX --- */
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.99); z-index: 6000;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #lightbox.visible { display: flex; opacity: 1; }
+        #lightboxImg { max-width: 95%; max-height: 95%; object-fit: contain; }
+        .close-lightbox {
+            position: absolute; top: 2rem; right: 2rem;
+            color: white; font-size: 3rem; background: none;
+            border: none; cursor: pointer; font-family: sans-serif;
         }
 
-        /* --- 9. FOOTER --- */
+        /* --- 10. FOOTER --- */
         footer { border-top: 1px solid var(--text-muted); padding: 4rem 0; background: var(--bg-color); transition: background 0.4s; opacity: 0.9; }
         .footer-content { display: flex; justify-content: space-between; align-items: flex-start; }
         .footer-left { display: flex; flex-direction: column; gap: 1rem; }
@@ -417,14 +438,18 @@
 </head>
 <body>
 
-    <!-- FONT PICKER PANEL (CLEAN ONLY) -->
+    <!-- FONT PICKER PANEL -->
     <div id="stylePanel">
         <div class="panel-header">
             <span>Typography Styles</span>
             <span style="cursor:pointer" onclick="document.getElementById('stylePanel').classList.remove('visible')">✕</span>
         </div>
-        <!-- DEFAULT IS INTER -->
-        <div class="font-option active" onclick="setFont('inter', this)">
+        <!-- DEFAULT IS BOLD GOTHIC -->
+        <div class="font-option active" onclick="setFont('gothic', this)">
+            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Bold Gothic</div>
+            <div class="font-meta">Bold American Gothic</div>
+        </div>
+        <div class="font-option" onclick="setFont('inter', this)">
             <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Inter Display</div>
             <div class="font-meta">Swiss International Style</div>
         </div>
@@ -443,10 +468,6 @@
         <div class="font-option" onclick="setFont('studio', this)">
             <div class="font-name-display" style="font-family: 'Work Sans', sans-serif;">Work Sans</div>
             <div class="font-meta">Design Studio Clean</div>
-        </div>
-        <div class="font-option" onclick="setFont('gothic', this)">
-            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Bold Gothic</div>
-            <div class="font-meta">Bold American Gothic</div>
         </div>
     </div>
 
@@ -510,7 +531,6 @@
                 <h2>Get in touch</h2>
                 <p>Interested in working together? Fill out the form or send me a direct email to discuss your next project.</p>
             </div>
-            <!-- Simple Mailto Form -->
             <form action="mailto:mmurtha@gmail.com" method="post" enctype="text/plain" class="contact-form">
                 <div class="form-group">
                     <input type="text" name="name" placeholder="Name" required>
@@ -550,17 +570,20 @@
     <div id="videoModal" class="modal">
         <div class="modal-container">
             <button class="close-modal" onclick="closeModal()">✕</button>
-            
-            <div class="video-wrapper"><iframe id="vimeoPlayer" src="" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
-            
+            <div id="videoContainer"></div> <!-- Dynamic container for videos -->
             <div class="project-details">
                 <div id="modalTitle">Project Title</div>
                 <div id="modalDesc">Project description goes here...</div>
             </div>
-
             <div class="style-frames-header">Style Frames</div>
             <div id="framesGrid" class="style-frames-grid"></div>
         </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <button class="close-lightbox" onclick="closeLightbox()">✕</button>
+        <img id="lightboxImg" src="" alt="Full Screen">
     </div>
 
     <script>
@@ -586,14 +609,21 @@
             element.classList.add('active');
         }
 
-        // 3. PROJECT DATA (MAPPED TO FOLDER STRUCTURE)
+        // 3. PROJECT DATA (REORDERED & ZOETROPE REMOVED)
         const projects = [
-            { 
-                title: "Skeleton Crew", 
-                file: "SKELCREW.png", 
-                vimeo: "1141019603",
-                description: "Lead Motion Designer for this project. Focused on creating a gritty, textured look that matches the show's aesthetic.",
-                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"] 
+            {
+                title: "Wicked",
+                file: "assets/thumbs/WICKED.png", 
+                vimeo: "1142152199", 
+                description: "Magical atmosphere and particle effects design.",
+                frames: ["assets/stills/wicked/wicked1.png", "assets/stills/wicked/wicked2.png", "assets/stills/wicked/wicked3.png"]
+            },
+            {
+                title: "Furiosa",
+                file: "assets/thumbs/FURIOSA.png", 
+                vimeo: ["1142155470", "1142155443"], 
+                description: "High-octane visual development.",
+                frames: ["assets/stills/furiosa/furiosa1.png", "assets/stills/furiosa/furiosa2.png", "assets/stills/furiosa/furiosa3.png"]
             },
             { 
                 title: "The Flash", 
@@ -603,11 +633,11 @@
                 frames: ["assets/stills/flash/flash1.png", "assets/stills/flash/flash2.png", "assets/stills/flash/flash3.png"]
             },
             { 
-                title: "Jessica Jones", 
-                file: "JESSICAJONES.png", 
-                vimeo: "914963591",
-                description: "Title sequence design inspired by noir detective comics and watercolor aesthetics.",
-                frames: ["assets/stills/jessicajones/jj01.png", "assets/stills/jessicajones/jj02.png", "assets/stills/jessicajones/jj03.png"]
+                title: "Ink", 
+                file: "INK2.jpg", 
+                vimeo: "915781397", 
+                description: "A personal exploration of fluid dynamics and ink in water, simulated entirely in 3D.", 
+                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"] 
             },
             { 
                 title: "Godzilla MW", 
@@ -617,39 +647,11 @@
                 frames: ["assets/stills/godzilla/gdzl01.png", "assets/stills/godzilla/gdzl02.png", "assets/stills/godzilla/gdzl03.png", "assets/stills/godzilla/gdzl04.png"] 
             },
             { 
-                title: "Ink", 
-                file: "INK2.jpg", 
-                vimeo: "915781397", 
-                description: "A personal exploration of fluid dynamics and ink in water, simulated entirely in 3D.", 
-                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"] 
-            },
-            { 
-                title: "Kung Fu Panda", 
-                file: "KFP.jpg", 
-                vimeo: "914963679", 
-                description: "DreamWorks promotional package. Playful, energetic motion graphics.", 
-                frames: [] // No stills folder in screenshot
-            },
-            { 
                 title: "Modern Warfare 3", 
                 file: "MW3.jpg", 
                 vimeo: "914962979", 
                 description: "UI and HUD design for in-game cinematics. Focused on a tactical, military-tech aesthetic.", 
                 frames: ["assets/stills/mw3/mwthree1.png", "assets/stills/mw3/mwthree2.png", "assets/stills/mw3/mwthree3.png"] 
-            },
-            { 
-                title: "Now You See Me 2", 
-                file: "NYSM2.png", 
-                vimeo: "913927393", 
-                description: "Visual effects for the card throwing sequences.", 
-                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"] 
-            },
-            { 
-                title: "Rampage", 
-                file: "RAMPAGEOPEN.jpg", 
-                vimeo: "914970552", 
-                description: "Main title design featuring genetic mutation motifs.", 
-                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"] 
             },
             { 
                 title: "She Hulk", 
@@ -659,25 +661,39 @@
                 frames: ["assets/stills/shehulk/she1.png", "assets/stills/shehulk/she2.png", "assets/stills/shehulk/she3.png"] 
             },
             { 
-                title: "Zoetrope", 
-                file: "ZOETROPE.jpg", 
-                vimeo: "914963075", 
-                description: "Experimental short film exploring animation history.", 
-                frames: ["assets/stills/zoetrope/zoe1.png", "assets/stills/zoetrope/zoe2.png"] 
+                title: "Skeleton Crew", 
+                file: "SKELCREW.png", 
+                vimeo: "1141019603",
+                description: "Lead Motion Designer for this project. Focused on creating a gritty, textured look that matches the show's aesthetic.",
+                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"] 
             },
-            {
-                title: "Wicked",
-                file: "assets/stills/wicked/wicked1.png", // Using still as thumb since no thumb in assets/thumbs
-                vimeo: "1141019603", // Placeholder ID
-                description: "Magical atmosphere and particle effects design.",
-                frames: ["assets/stills/wicked/wicked1.png", "assets/stills/wicked/wicked2.png", "assets/stills/wicked/wicked3.png"]
+            { 
+                title: "Now You See Me 2", 
+                file: "NYSM2.png", 
+                vimeo: "913927393", 
+                description: "Visual effects for the card throwing sequences.", 
+                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"] 
             },
-            {
-                title: "Furiosa",
-                file: "assets/stills/furiosa/furiosa1.png", // Using still as thumb
-                vimeo: "1141019603", // Placeholder ID
-                description: "High-octane visual development.",
-                frames: ["assets/stills/furiosa/furiosa1.png", "assets/stills/furiosa/furiosa2.png", "assets/stills/furiosa/furiosa3.png"]
+            { 
+                title: "Jessica Jones", 
+                file: "JESSICAJONES.png", 
+                vimeo: "914963591",
+                description: "Title sequence design inspired by noir detective comics and watercolor aesthetics.",
+                frames: ["assets/stills/jessicajones/jj01.png", "assets/stills/jessicajones/jj02.png", "assets/stills/jessicajones/jj03.png"]
+            },
+            { 
+                title: "Kung Fu Panda", 
+                file: "KFP.jpg", 
+                vimeo: "914963679", 
+                description: "DreamWorks promotional package. Playful, energetic motion graphics.", 
+                frames: [] 
+            },
+            { 
+                title: "Rampage", 
+                file: "RAMPAGEOPEN.jpg", 
+                vimeo: "914970552", 
+                description: "Main title design featuring genetic mutation motifs.", 
+                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"] 
             }
         ];
 
@@ -688,7 +704,6 @@
             const card = document.createElement('div');
             card.className = 'project-card';
             
-            // Check if file path is full path or just filename
             let imagePath;
             if (proj.file.includes('/')) {
                 imagePath = proj.file;
@@ -722,14 +737,29 @@
         function closeFloatingReel() { floatPlayer.style.display = 'none'; floatFrame.src = ""; }
 
         const modal = document.getElementById('videoModal');
-        const player = document.getElementById('vimeoPlayer');
+        const videoContainer = document.getElementById('videoContainer');
         const titleLabel = document.getElementById('modalTitle');
         const descLabel = document.getElementById('modalDesc');
         const framesGrid = document.getElementById('framesGrid');
 
         function openModal(project) {
             closeFloatingReel();
-            player.src = `https://player.vimeo.com/video/${project.vimeo}?autoplay=1&title=0&byline=0&portrait=0&color=ffffff`;
+            
+            // Generate Video Player(s)
+            videoContainer.innerHTML = ''; // Clear old videos
+            
+            // Check if vimeo ID is an array or string
+            const videos = Array.isArray(project.vimeo) ? project.vimeo : [project.vimeo];
+            
+            videos.forEach((vidId, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'video-wrapper';
+                // Only autoplay the first video
+                const autoPlay = index === 0 ? 1 : 0;
+                wrapper.innerHTML = `<iframe src="https://player.vimeo.com/video/${vidId}?autoplay=${autoPlay}&title=0&byline=0&portrait=0&color=ffffff" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                videoContainer.appendChild(wrapper);
+            });
+
             titleLabel.innerText = project.title;
             descLabel.innerText = project.description;
 
@@ -739,6 +769,8 @@
                     const img = document.createElement('img');
                     img.className = 'style-frame';
                     img.src = framePath; 
+                    // ADDED CLICK EVENT TO OPEN LIGHTBOX
+                    img.addEventListener('click', () => openLightbox(framePath));
                     framesGrid.appendChild(img);
                 });
             }
@@ -748,12 +780,26 @@
 
         function closeModal() { 
             modal.classList.remove('open'); 
-            player.src = ""; 
+            videoContainer.innerHTML = ''; // Stop video playback
             document.body.style.overflow = 'auto'; 
         }
         modal.addEventListener('click', (e) => { 
             if (e.target === modal || e.target.classList.contains('modal-container')) closeModal(); 
         });
+
+        // 7. LIGHTBOX LOGIC
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('visible');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('visible');
+            setTimeout(() => { lightboxImg.src = ""; }, 300); // Clear after fade out
+        }
     </script>
 </body>
 </html>
