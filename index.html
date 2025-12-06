@@ -19,17 +19,22 @@
     <style>
         /* --- 1. CORE STYLES & VARIABLES --- */
         :root {
+            /* Default Dark Theme */
             --bg-color: #050505;
             --card-bg: #111111;
             --text-main: #ffffff;
             --text-muted: #888888;
             --header-gradient: linear-gradient(to bottom, rgba(5,5,5,0.95), rgba(5,5,5,0.0));
+            
             --btn-bg: #ffffff;
             --btn-text: #000000;
             --input-bg: #1a1a1a;
             --input-border: #333333;
+            
             --icon-filter: invert(0); 
-            --hero-bg-opacity: 0.15;
+            
+            /* BACKGROUND IMAGE OPACITY (Adjust this from 0.1 to 1.0) */
+            --hero-bg-opacity: 0.6;
             
             /* DEFAULT FONTS (BOLD GOTHIC) */
             --font-display: 'Archivo', sans-serif;
@@ -50,11 +55,15 @@
             --text-main: #000000;
             --text-muted: #555555;
             --header-gradient: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.0));
+            
             --btn-bg: #000000;
             --btn-text: #ffffff;
             --input-bg: #f0f0f0;
             --input-border: #e0e0e0;
+            
             --icon-filter: invert(1);
+            
+            /* Hide background image in light mode */
             --hero-bg-opacity: 0;
         }
 
@@ -162,9 +171,13 @@
         }
         .hero-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* BACKGROUND IMAGE REMOVED */
-            background: transparent;
-            z-index: 0;
+            /* NEW BACKGROUND IMAGE */
+            background-image: url('assets/images/M3_Main.png'); 
+            background-size: cover; 
+            background-position: center;
+            opacity: var(--hero-bg-opacity); 
+            filter: grayscale(100%);
+            transition: opacity 0.5s ease; z-index: 0;
         }
         .hero-container { position: relative; z-index: 2; width: 100%; max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
         .hero-content { max-width: 900px; opacity: 0; transform: translateY(30px); transition: opacity 1s, transform 1s; }
@@ -609,7 +622,7 @@
             element.classList.add('active');
         }
 
-        // 3. PROJECT DATA (REORDERED & ZOETROPE REMOVED)
+        // 3. PROJECT DATA
         const projects = [
             {
                 title: "Wicked",
