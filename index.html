@@ -623,6 +623,7 @@
         }
 
         // 3. SITE CONTENT CONFIG
+        let siteContent = {
         const siteContent = {
             brandName: { text: 'Michael Rush Murtha', size: 1.1 },
             heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
@@ -653,6 +654,67 @@
 
         applySiteContent(siteContent);
 
+        const projectContentOverrides = {};
+
+        function applyProjectOverrides(sourceProjects, overrides = {}) {
+            return sourceProjects.map((project) => {
+                const override = overrides[project.file];
+                if (!override) return { ...project };
+                return {
+                    ...project,
+                    title: override.title ?? project.title,
+                    category: override.category ?? project.category,
+                    role: override.role ?? project.role,
+                    year: override.year ?? project.year,
+                    studio: override.studio ?? project.studio,
+                    deliverables: override.deliverables ?? project.deliverables,
+                    description: override.description ?? project.description
+                };
+            });
+        }
+
+        function getProjectContentSnapshot(currentProjects) {
+            return currentProjects.reduce((acc, project) => {
+                acc[project.file] = {
+                    title: project.title,
+                    category: project.category,
+                    role: project.role,
+                    year: project.year,
+                    studio: project.studio,
+                    deliverables: project.deliverables,
+                    description: project.description
+                };
+                return acc;
+            }, {});
+        }
+
+        function applyEditorPreviewUpdate(payload = {}) {
+            if (payload.siteContent) {
+                siteContent = payload.siteContent;
+                applySiteContent(siteContent);
+            }
+
+            if (payload.projectOverrides) {
+                projects = applyProjectOverrides(baseProjects, payload.projectOverrides);
+                renderGallery();
+            }
+        }
+
+        window.getPortfolioEditorSnapshot = function getPortfolioEditorSnapshot() {
+            return {
+                siteContent,
+                projectContent: getProjectContentSnapshot(projects)
+            };
+        };
+
+        window.addEventListener('message', (event) => {
+            const data = event.data || {};
+            if (data.type !== 'portfolio-preview-update') return;
+            applyEditorPreviewUpdate(data.payload);
+        });
+
+        // 4. PROJECT DATA
+        const baseProjects = [
         // 4. PROJECT DATA
         const projects = [
             {
@@ -801,9 +863,35 @@
             }
         ];
 
+        let projects = applyProjectOverrides(baseProjects, projectContentOverrides);
+
         const galleryContainer = document.getElementById('gallery-grid');
 
         // 5. GENERATE GRID
+        function renderGallery() {
+            galleryContainer.innerHTML = '';
+
+            projects.forEach((proj) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+
+                const imagePath = proj.file.includes('/') ? proj.file : `assets/thumbs/${proj.file}`;
+
+                card.innerHTML = `
+                    <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
+                    <div class="card-overlay">
+                        <div class="card-title">${proj.title}</div>
+                        <div class="card-action">View Project</div>
+                        <div class="card-meta">${proj.category} • ${proj.role}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(proj));
+                galleryContainer.appendChild(card);
+            });
+        }
+
+        renderGallery();
         projects.forEach((proj, index) => {
             const card = document.createElement('div');
             card.className = 'project-card';

@@ -3,6 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Private Site Editor</title>
+<style>
+  :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
+* { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, sans-serif; background:var(--bg); color:var(--text); }
+    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+    .hidden { display:none !important; }
+    .shell { display:grid; grid-template-columns: 430px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
+    .left { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
+    .right { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+    .row { display:flex; gap:.6rem; align-items:center; }
+    h1 { font-size:1.05rem; margin:.1rem 0; }
+    .muted { color:var(--muted); font-size:.84rem; }
+    .section { margin-top:1rem; border-top:1px solid var(--border); padding-top:.8rem; }
+    .section h2 { margin:0 0 .5rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    .field { border:1px solid var(--border); border-radius:9px; padding:.55rem; margin-bottom:.55rem; background:#11131a; }
+    .label { display:block; font-size:.73rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.35rem; }
+    input[type='text'], textarea, input[type='password'] { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.5rem .6rem; }
+    textarea { min-height:78px; resize:vertical; }
+    .size { display:grid; grid-template-columns:1fr auto; gap:.45rem; align-items:center; margin-top:.45rem; }
+    input[type='range'] { width:100%; accent-color:var(--accent); }
+    .pill { border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.72rem; padding:.2rem .45rem; min-width:64px; text-align:center; }
+    .actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem; }
+    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
+    .primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
+    iframe { width:100%; height:100%; border:0; }
+    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.6rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
+    @media (max-width: 1100px) { .shell { grid-template-columns:1fr; } .right { min-height:70vh; } .left { max-height:none; } }
   <title>Site Content Editor | Private</title>
   <style>
     :root {
@@ -48,6 +76,32 @@
 </head>
 <body>
   <div id="gate" class="gate">
+    <h1>Private editor</h1>
+    <p class="muted">Separate from homepage. Enter your key to unlock the editor and live preview.</p>
+    <label class="label" for="key">Editor key</label>
+    <input id="key" type="password" />
+    <div class="actions"><button id="unlock" class="primary">Unlock</button></div>
+  </div>
+
+  <main id="app" class="shell hidden">
+    <section class="left">
+      <h1>Site Content Editor</h1>
+      <p class="muted">Edits update live preview instantly. Includes card/modal copy for every project image.</p>
+      <div class="actions">
+        <button id="copyConfig" class="primary">Copy config</button>
+        <button id="reloadDefaults">Reload defaults</button>
+      </div>
+      <div class="section">
+        <h2>Main site text</h2>
+        <div id="siteFields"></div>
+      </div>
+      <div class="section">
+        <h2>Project image text (cards + modal)</h2>
+        <div id="projectFields"></div>
+      </div>
+      <pre id="output"></pre>
+    </section>
+    <section class="right"><iframe id="preview" src="/"></iframe></section>
     <h1>Private Editor Access</h1>
     <p class="muted">This page is intentionally separate from the homepage. Enter your private key to unlock.</p>
     <label class="label" for="pass">Editor key</label>
@@ -82,6 +136,134 @@
     const EDITOR_KEY = 'mrm-private-editor';
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
+    const keyInput = document.getElementById('key');
+    const preview = document.getElementById('preview');
+
+    const state = { siteContent: {}, projectContent: {} };
+
+    function postPreviewUpdate() {
+      preview.contentWindow.postMessage({
+        type: 'portfolio-preview-update',
+        payload: {
+          siteContent: state.siteContent,
+          projectOverrides: state.projectContent
+        }
+      }, window.location.origin);
+      renderOutput();
+    }
+
+    function renderOutput() {
+      const out = `const siteContent = ${JSON.stringify(state.siteContent, null, 2)};\n\nconst projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
+      document.getElementById('output').textContent = out;
+    }
+
+    function makeSiteField(id, config) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${id}</label>`;
+
+      const input = document.createElement('textarea');
+      input.value = config.text;
+      input.addEventListener('input', () => { state.siteContent[id].text = input.value; postPreviewUpdate(); });
+
+      const row = document.createElement('div'); row.className = 'size';
+      const range = document.createElement('input'); range.type = 'range'; range.min = '0.55'; range.max = '8'; range.step = '0.05'; range.value = String(config.size || 1);
+      const pill = document.createElement('span'); pill.className = 'pill'; pill.textContent = `${range.value}rem`;
+      range.addEventListener('input', () => {
+        state.siteContent[id].size = Number(range.value);
+        pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
+        postPreviewUpdate();
+      });
+      row.appendChild(range); row.appendChild(pill);
+      box.appendChild(input); box.appendChild(row);
+      return box;
+    }
+
+    function makeProjectField(projectKey, config) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${config.title || projectKey} <span class="muted">(${projectKey})</span></label>`;
+
+      ['title','category','role','year','studio','deliverables','description'].forEach((key) => {
+        const label = document.createElement('label');
+        label.className = 'label';
+        label.textContent = key;
+
+        const input = document.createElement(key === 'description' ? 'textarea' : 'input');
+        if (key !== 'description') input.type = 'text';
+        input.value = config[key] ?? '';
+        input.addEventListener('input', () => {
+          state.projectContent[projectKey][key] = input.value;
+          postPreviewUpdate();
+        });
+
+        box.appendChild(label);
+        box.appendChild(input);
+      });
+
+      return box;
+    }
+
+    function renderForms() {
+      const siteRoot = document.getElementById('siteFields');
+      const projectRoot = document.getElementById('projectFields');
+      siteRoot.innerHTML = '';
+      projectRoot.innerHTML = '';
+
+      Object.entries(state.siteContent).forEach(([id, config]) => {
+        siteRoot.appendChild(makeSiteField(id, config));
+      });
+
+      Object.entries(state.projectContent).forEach(([projectKey, config]) => {
+        projectRoot.appendChild(makeProjectField(projectKey, config));
+      });
+
+      renderOutput();
+    }
+
+    function deepClone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function hydrateFromPreview() {
+      const snapshot = preview.contentWindow.getPortfolioEditorSnapshot?.();
+      if (!snapshot) return;
+      state.siteContent = deepClone(snapshot.siteContent || {});
+      state.projectContent = deepClone(snapshot.projectContent || {});
+      renderForms();
+      postPreviewUpdate();
+    }
+
+    function unlockEditor() {
+      if (keyInput.value !== EDITOR_KEY) {
+        alert('Incorrect key.');
+        return;
+      }
+      sessionStorage.setItem('editorUnlocked', '1');
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+      if (preview.contentWindow?.document?.readyState === 'complete') hydrateFromPreview();
+    }
+
+    document.getElementById('unlock').addEventListener('click', unlockEditor);
+
+    if (sessionStorage.getItem('editorUnlocked') === '1') {
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+      if (preview.contentWindow?.document?.readyState === 'complete') hydrateFromPreview();
+    }
+
+    document.getElementById('copyConfig').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(document.getElementById('output').textContent);
+      alert('Copied config. Paste both constants into index.html.');
+    });
+
+    document.getElementById('reloadDefaults').addEventListener('click', () => {
+      preview.src = '/';
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+    });
     const pass = document.getElementById('pass');
 
     document.getElementById('unlock').addEventListener('click', () => {
