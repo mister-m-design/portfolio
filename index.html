@@ -624,6 +624,7 @@
 
         // 3. SITE CONTENT CONFIG
         let siteContent = {
+        const siteContent = {
             brandName: { text: 'Michael Rush Murtha', size: 1.1 },
             heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
             heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
@@ -714,6 +715,8 @@
 
         // 4. PROJECT DATA
         const baseProjects = [
+        // 4. PROJECT DATA
+        const projects = [
             {
                 title: "Wicked",
                 file: "assets/thumbs/WICKED.png",
@@ -889,6 +892,28 @@
         }
 
         renderGallery();
+        projects.forEach((proj, index) => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            
+            let imagePath;
+            if (proj.file.includes('/')) {
+                imagePath = proj.file;
+            } else {
+                imagePath = `assets/thumbs/${proj.file}`;
+            }
+            
+            card.innerHTML = `
+                <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
+                <div class="card-overlay">
+                    <div class="card-title">${proj.title}</div>
+                    <div class="card-action">View Project</div>
+                    <div class="card-meta">${proj.category} • ${proj.role}</div>
+                </div>
+            `;
+            card.addEventListener('click', () => openModal(proj));
+            galleryContainer.appendChild(card);
+        });
 
         // 6. LOAD ANIMATION
         window.addEventListener('load', () => { document.getElementById('hero-content').classList.add('visible'); });
