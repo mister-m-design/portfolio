@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor6</title>
+  <title>Private CMS Editor7</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -218,7 +218,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.0';
+    const CMS_EDITOR_VERSION = 'v2.2.1';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -500,8 +500,13 @@
           transform: none !important;
           opacity: 1 !important;
         }
+        [data-cms-card-edit='on'] .project-card .card-overlay {
+          opacity: 0 !important;
+          background: transparent !important;
+          backdrop-filter: none !important;
+        }
         [data-cms-card-edit='on'] .project-card:hover .card-overlay {
-          opacity: 1 !important;
+          opacity: 0 !important;
         }
       `;
     }
