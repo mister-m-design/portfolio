@@ -118,7 +118,6 @@
         .font-option.active { border-color: var(--text-main); background: rgba(128,128,128,0.05); }
         .font-name-display { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
         .font-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-family: 'Inter', sans-serif; }
-
         /* --- 3. LAYOUT & HEADER --- */
         .container { max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
 
@@ -495,7 +494,7 @@
         <div class="container nav-container">
             <a href="#" class="branding">
                 <img src="assets/portfolio/logo_assets/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
-                <span class="brand-name">Michael Rush Murtha</span>
+                <span class="brand-name" id="brandName">Michael Rush Murtha</span>
             </a>
             <div class="nav-right">
                 <ul class="nav-links">
@@ -524,22 +523,22 @@
         <div class="hero-bg"></div>
         <div class="hero-container">
             <div class="hero-content" id="hero-content">
-                <div class="hero-kicker">Motion Graphics • Main Title Design • Visual Development</div>
-                <h1>Title Design for<br>Film, TV, & Games</h1>
-                <p>I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.</p>
-                <button class="play-btn" onclick="openFloatingReel('74537740')">▶ Watch Reel</button>
+                <div class="hero-kicker" id="heroKicker">Motion Graphics • Main Title Design • Visual Development</div>
+                <h1 id="heroTitle">Title Design for<br>Film, TV, & Games</h1>
+                <p id="heroDescription">I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.</p>
+                <button class="play-btn" id="heroCta" onclick="openFloatingReel('74537740')">▶ Watch Reel</button>
                 <div class="hero-stats">
                     <div class="hero-stat">
-                        <div class="hero-stat-value">15+</div>
-                        <div class="hero-stat-label">Years in design + VFX</div>
+                        <div class="hero-stat-value" id="heroStat1Value">15+</div>
+                        <div class="hero-stat-label" id="heroStat1Label">Years in design + VFX</div>
                     </div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value">20+</div>
-                        <div class="hero-stat-label">Major film / TV / game credits</div>
+                        <div class="hero-stat-value" id="heroStat2Value">20+</div>
+                        <div class="hero-stat-label" id="heroStat2Label">Major film / TV / game credits</div>
                     </div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value">End-to-End</div>
-                        <div class="hero-stat-label">Concept, design, animation, comp</div>
+                        <div class="hero-stat-value" id="heroStat3Value">End-to-End</div>
+                        <div class="hero-stat-label" id="heroStat3Label">Concept, design, animation, comp</div>
                     </div>
                 </div>
             </div>
@@ -550,8 +549,8 @@
     <main id="work" class="gallery-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Selected Works</h2>
-                <div class="section-title">Project Context + Contributions</div>
+                <h2 class="section-title" id="workHeading">Selected Works</h2>
+                <div class="section-title" id="workSubheading">Project Context + Contributions</div>
             </div>
             <div id="gallery-grid" class="gallery"></div>
         </div>
@@ -561,8 +560,8 @@
     <footer id="footer">
         <div class="container footer-content">
             <div class="footer-left">
-                <a href="mailto:mmurtha@gmail.com" class="footer-email">mmurtha@gmail.com</a>
-                <div class="copyright">&copy; 2024 Michael Rush Murtha</div>
+                <a href="mailto:mmurtha@gmail.com" class="footer-email" id="footerEmail">mmurtha@gmail.com</a>
+                <div class="copyright" id="copyrightText">&copy; 2024 Michael Rush Murtha</div>
             </div>
             <div class="social-icons">
                 <a href="https://vimeo.com/user16395134" target="_blank"><img src="assets/socialIcons/vimeo_White.png" alt="Vimeo"></a>
@@ -589,7 +588,7 @@
                 </div>
                 <div id="modalDesc">Project description goes here...</div>
             </div>
-            <div class="style-frames-header">Style Frames</div>
+            <div class="style-frames-header" id="framesHeader">Style Frames</div>
             <div id="framesGrid" class="style-frames-grid"></div>
         </div>
     </div>
@@ -623,8 +622,98 @@
             element.classList.add('active');
         }
 
-        // 3. PROJECT DATA
-        const projects = [
+        // 3. SITE CONTENT CONFIG
+        let siteContent = {
+            brandName: { text: 'Michael Rush Murtha', size: 1.1 },
+            heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
+            heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
+            heroDescription: { text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.', size: 1.2 },
+            heroCta: { text: '▶ Watch Reel', size: 0.9 },
+            heroStat1Value: { text: '15+', size: 1.6 },
+            heroStat1Label: { text: 'Years in design + VFX', size: 0.7 },
+            heroStat2Value: { text: '20+', size: 1.6 },
+            heroStat2Label: { text: 'Major film / TV / game credits', size: 0.7 },
+            heroStat3Value: { text: 'End-to-End', size: 1.6 },
+            heroStat3Label: { text: 'Concept, design, animation, comp', size: 0.7 },
+            workHeading: { text: 'Selected Works', size: 1 },
+            workSubheading: { text: 'Project Context + Contributions', size: 1 },
+            framesHeader: { text: 'Style Frames', size: 1 },
+            footerEmail: { text: 'mmurtha@gmail.com', size: 1.2 },
+            copyrightText: { text: '&copy; 2024 Michael Rush Murtha', size: 0.8 }
+        };
+
+        function applySiteContent(contentConfig) {
+            Object.entries(contentConfig).forEach(([id, content]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (typeof content.text === 'string') el.innerHTML = content.text;
+                if (content.size) el.style.fontSize = `${content.size}rem`;
+            });
+        }
+
+        applySiteContent(siteContent);
+
+        const projectContentOverrides = {};
+
+        function applyProjectOverrides(sourceProjects, overrides = {}) {
+            return sourceProjects.map((project) => {
+                const override = overrides[project.file];
+                if (!override) return { ...project };
+                return {
+                    ...project,
+                    title: override.title ?? project.title,
+                    category: override.category ?? project.category,
+                    role: override.role ?? project.role,
+                    year: override.year ?? project.year,
+                    studio: override.studio ?? project.studio,
+                    deliverables: override.deliverables ?? project.deliverables,
+                    description: override.description ?? project.description
+                };
+            });
+        }
+
+        function getProjectContentSnapshot(currentProjects) {
+            return currentProjects.reduce((acc, project) => {
+                acc[project.file] = {
+                    title: project.title,
+                    category: project.category,
+                    role: project.role,
+                    year: project.year,
+                    studio: project.studio,
+                    deliverables: project.deliverables,
+                    description: project.description
+                };
+                return acc;
+            }, {});
+        }
+
+        function applyEditorPreviewUpdate(payload = {}) {
+            if (payload.siteContent) {
+                siteContent = payload.siteContent;
+                applySiteContent(siteContent);
+            }
+
+            if (payload.projectOverrides) {
+                projects = applyProjectOverrides(baseProjects, payload.projectOverrides);
+                renderGallery();
+            }
+        }
+
+        window.getPortfolioEditorSnapshot = function getPortfolioEditorSnapshot() {
+            return {
+                siteContent,
+                projectContent: getProjectContentSnapshot(projects)
+            };
+        };
+
+        window.addEventListener('message', (event) => {
+            const data = event.data || {};
+            if (data.type !== 'portfolio-preview-update') return;
+            applyEditorPreviewUpdate(data.payload);
+        });
+
+        // 4. PROJECT DATA
+        const baseProjects = [
             {
                 title: "Wicked",
                 file: "assets/thumbs/WICKED.png",
@@ -771,36 +860,40 @@
             }
         ];
 
+        let projects = applyProjectOverrides(baseProjects, projectContentOverrides);
+
         const galleryContainer = document.getElementById('gallery-grid');
 
-        // 4. GENERATE GRID
-        projects.forEach((proj, index) => {
-            const card = document.createElement('div');
-            card.className = 'project-card';
-            
-            let imagePath;
-            if (proj.file.includes('/')) {
-                imagePath = proj.file;
-            } else {
-                imagePath = `assets/thumbs/${proj.file}`;
-            }
-            
-            card.innerHTML = `
-                <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
-                <div class="card-overlay">
-                    <div class="card-title">${proj.title}</div>
-                    <div class="card-action">View Project</div>
-                    <div class="card-meta">${proj.category} • ${proj.role}</div>
-                </div>
-            `;
-            card.addEventListener('click', () => openModal(proj));
-            galleryContainer.appendChild(card);
-        });
+        // 5. GENERATE GRID
+        function renderGallery() {
+            galleryContainer.innerHTML = '';
 
-        // 5. LOAD ANIMATION
+            projects.forEach((proj) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+
+                const imagePath = proj.file.includes('/') ? proj.file : `assets/thumbs/${proj.file}`;
+
+                card.innerHTML = `
+                    <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
+                    <div class="card-overlay">
+                        <div class="card-title">${proj.title}</div>
+                        <div class="card-action">View Project</div>
+                        <div class="card-meta">${proj.category} • ${proj.role}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(proj));
+                galleryContainer.appendChild(card);
+            });
+        }
+
+        renderGallery();
+
+        // 6. LOAD ANIMATION
         window.addEventListener('load', () => { document.getElementById('hero-content').classList.add('visible'); });
 
-        // 6. PLAYER LOGIC
+        // 7. PLAYER LOGIC
         const floatPlayer = document.getElementById('floatingPlayer');
         const floatFrame = document.getElementById('floatFrame');
         
@@ -864,7 +957,7 @@
             if (e.target === modal || e.target.classList.contains('modal-container')) closeModal(); 
         });
 
-        // 7. LIGHTBOX LOGIC
+        // 8. LIGHTBOX LOGIC
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightboxImg');
 

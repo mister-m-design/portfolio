@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Site Editor</title>
+  <style>
+    :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, sans-serif; background:var(--bg); color:var(--text); }
+    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+    .hidden { display:none !important; }
+    .shell { display:grid; grid-template-columns: 460px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
+    .left { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
+    .right { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+    h1 { font-size:1.08rem; margin:.1rem 0; }
+    .muted { color:var(--muted); font-size:.84rem; }
+    .section { margin-top:1rem; border-top:1px solid var(--border); padding-top:.8rem; }
+    .section h2 { margin:0 0 .55rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    .field { border:1px solid var(--border); border-radius:9px; padding:.55rem; margin-bottom:.55rem; background:#11131a; }
+    .label { display:block; font-size:.72rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.35rem; }
+    input[type='text'], textarea, input[type='password'] { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.5rem .6rem; }
+    textarea { min-height:78px; resize:vertical; }
+    .size { display:grid; grid-template-columns:1fr auto; gap:.45rem; align-items:center; margin-top:.45rem; }
+    input[type='range'] { width:100%; accent-color:var(--accent); }
+    .pill { border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.72rem; padding:.2rem .45rem; min-width:64px; text-align:center; }
+    .actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem; }
+    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
+    .primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
+    iframe { width:100%; height:100%; border:0; }
+    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.6rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
+    @media (max-width: 1100px) { .shell { grid-template-columns:1fr; } .right { min-height:70vh; } .left { max-height:none; } }
+  </style>
+</head>
+<body>
+  <div id="gate" class="gate">
+    <h1>Private editor</h1>
+    <p class="muted">Separate from homepage. Enter your key to unlock the editor and live preview.</p>
+    <label class="label" for="key">Editor key</label>
+    <input id="key" type="password" />
+    <div class="actions"><button id="unlock" class="primary">Unlock</button></div>
+  </div>
+
+  <main id="app" class="shell hidden">
+    <section class="left">
+      <h1>Site Content Editor</h1>
+      <p class="muted">All fields are always visible here. Live preview updates on the right when available.</p>
+      <div class="actions">
+        <button id="copyConfig" class="primary">Copy config</button>
+        <button id="resetBtn">Reset defaults</button>
+      </div>
+
+      <div class="section">
+        <h2>Main site text</h2>
+        <div id="siteFields"></div>
+      </div>
+
+      <div class="section">
+        <h2>Project image text (cards + modal)</h2>
+        <div id="projectFields"></div>
+      </div>
+
+      <pre id="output"></pre>
+    </section>
+    <section class="right"><iframe id="preview" src="index.html"></iframe></section>
+  </main>
+
+  <script>
+    const EDITOR_KEY = 'mrm-private-editor';
+    const gate = document.getElementById('gate');
+    const app = document.getElementById('app');
+    const keyInput = document.getElementById('key');
+    const preview = document.getElementById('preview');
+
+    const defaultSiteContent = {
+      brandName: { text: 'Michael Rush Murtha', size: 1.1 },
+      heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
+      heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
+      heroDescription: { text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.', size: 1.2 },
+      heroCta: { text: '▶ Watch Reel', size: 0.9 },
+      heroStat1Value: { text: '15+', size: 1.6 },
+      heroStat1Label: { text: 'Years in design + VFX', size: 0.7 },
+      heroStat2Value: { text: '20+', size: 1.6 },
+      heroStat2Label: { text: 'Major film / TV / game credits', size: 0.7 },
+      heroStat3Value: { text: 'End-to-End', size: 1.6 },
+      heroStat3Label: { text: 'Concept, design, animation, comp', size: 0.7 },
+      workHeading: { text: 'Selected Works', size: 1 },
+      workSubheading: { text: 'Project Context + Contributions', size: 1 },
+      framesHeader: { text: 'Style Frames', size: 1 },
+      footerEmail: { text: 'mmurtha@gmail.com', size: 1.2 },
+      copyrightText: { text: '&copy; 2024 Michael Rush Murtha', size: 0.8 }
+    };
+
+    const defaultProjectContent = {
+      'assets/thumbs/WICKED.png': { title: 'Wicked', category: 'Film Campaign', role: 'Motion Designer / Art Director', year: '2024', studio: 'Campaign / AV', deliverables: 'Main-on-end graphics, transitions, atmospheric FX', description: "Designed a fantasy-led motion language using particles, glows, and elegant transitions to match the film's magical tone." },
+      'assets/thumbs/FURIOSA.png': { title: 'Furiosa', category: 'Film', role: 'Motion Designer', year: '2024', studio: 'Entertainment Marketing', deliverables: 'Title cards, grit textures, kinetic transitions', description: 'Built aggressive visual treatments and typography timing for high-energy trailer moments and campaign assets.' },
+      'FLASH.jpg': { title: 'The Flash', category: 'Feature Film', role: 'VFX Supervisor', year: '2023', studio: 'Warner Bros.', deliverables: 'Speed force visuals, electric simulation beats', description: 'Supervised key speed force sequences with an emphasis on physical energy behavior and cinematic readability.' },
+      'INK2.jpg': { title: 'Ink', category: 'R&D / Personal', role: 'Director + Animator', year: '2023', studio: 'Independent', deliverables: 'Fluid simulation, look development', description: 'Personal R&D study focused on fluid dynamics, macro photography references, and stylized compositing.' },
+      'GODZILLAMW.png': { title: 'Godzilla MW', category: 'Feature Integration', role: 'Lead Motion Designer', year: '2022', studio: 'Legendary / Promo', deliverables: 'Creature-themed UI, destruction motifs', description: 'Designed and animated brand-integrated graphics with heavy Houdini simulation and compositing support.' },
+      'MW3.jpg': { title: 'Modern Warfare 3', category: 'Game Cinematics', role: 'UI / HUD Designer', year: '2023', studio: 'Activision', deliverables: 'Mission UI, tactical overlays, data animation', description: 'Crafted militarized interface design for cinematic gameplay moments with clarity-first animation systems.' },
+      'SHE_HULK_STILL.jpg': { title: 'She Hulk', category: 'Series', role: 'Motion Graphics Designer', year: '2022', studio: 'Marvel / Disney+', deliverables: 'Courtroom graphics, lower thirds, transitions', description: 'Developed courtroom-style informational graphics and lower thirds to support tone and legal-comedy pacing.' },
+      'SKELCREW.png': { title: 'Skeleton Crew', category: 'Series', role: 'Lead Motion Designer', year: '2024', studio: 'Lucasfilm', deliverables: 'Textured motion language, episodic graphics', description: 'Led motion design direction focused on tactile textures, distressed typography, and world-consistent interface graphics.' },
+      'NYSM2.png': { title: 'Now You See Me 2', category: 'Feature Film', role: 'VFX Artist', year: '2016', studio: 'Lionsgate', deliverables: 'Card trails, reveal composites', description: 'Designed and composited stylized card-throwing visuals with precision-timed FX for major illusion beats.' },
+      'JESSICAJONES.png': { title: 'Jessica Jones', category: 'Main Title', role: 'Title Designer', year: '2015', studio: 'Marvel / Netflix', deliverables: 'Title sequence, painterly motion system', description: 'Created a noir comic-inspired title sequence blending watercolor textures with moody, investigative pacing.' },
+      'KFP.jpg': { title: 'Kung Fu Panda', category: 'Animated Promo', role: 'Motion Designer', year: '2016', studio: 'DreamWorks', deliverables: 'Broadcast package, energetic transitions', description: 'Developed a playful, high-tempo promo package with character-aligned timing and expressive graphic transitions.' },
+      'RAMPAGEOPEN.jpg': { title: 'Rampage', category: 'Main Title', role: 'Title Designer', year: '2018', studio: 'Warner Bros.', deliverables: 'Opening title sequence, mutation motifs', description: 'Designed a mutation-driven title sequence using biological forms, data overlays, and aggressive scale transitions.' }
+    };
+
+    let state = {
+      siteContent: JSON.parse(JSON.stringify(defaultSiteContent)),
+      projectContent: JSON.parse(JSON.stringify(defaultProjectContent))
+    };
+
+    function postPreviewUpdate() {
+      try {
+        preview.contentWindow.postMessage({
+          type: 'portfolio-preview-update',
+          payload: {
+            siteContent: state.siteContent,
+            projectOverrides: state.projectContent
+          }
+        }, window.location.origin);
+      } catch {}
+    }
+
+    function renderOutput() {
+      document.getElementById('output').textContent =
+`let siteContent = ${JSON.stringify(state.siteContent, null, 2)};\n\nlet projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
+    }
+
+    function makeSiteField(id, value) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${id}</label>`;
+
+      const input = document.createElement('textarea');
+      input.value = value.text;
+      input.addEventListener('input', () => {
+        state.siteContent[id].text = input.value;
+        renderOutput();
+        postPreviewUpdate();
+      });
+
+      const row = document.createElement('div');
+      row.className = 'size';
+      const range = document.createElement('input');
+      range.type = 'range';
+      range.min = '0.55';
+      range.max = '8';
+      range.step = '0.05';
+      range.value = String(value.size || 1);
+      const pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.textContent = `${range.value}rem`;
+
+      range.addEventListener('input', () => {
+        state.siteContent[id].size = Number(range.value);
+        pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
+        renderOutput();
+        postPreviewUpdate();
+      });
+
+      row.appendChild(range);
+      row.appendChild(pill);
+      box.appendChild(input);
+      box.appendChild(row);
+      return box;
+    }
+
+    function makeProjectField(projectKey, value) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${value.title} <span class="muted">(${projectKey})</span></label>`;
+
+      ['title', 'category', 'role', 'year', 'studio', 'deliverables', 'description'].forEach((fieldKey) => {
+        const label = document.createElement('label');
+        label.className = 'label';
+        label.textContent = fieldKey;
+
+        const input = document.createElement(fieldKey === 'description' ? 'textarea' : 'input');
+        if (fieldKey !== 'description') input.type = 'text';
+        input.value = value[fieldKey] || '';
+        input.addEventListener('input', () => {
+          state.projectContent[projectKey][fieldKey] = input.value;
+          renderOutput();
+          postPreviewUpdate();
+        });
+
+        box.appendChild(label);
+        box.appendChild(input);
+      });
+
+      return box;
+    }
+
+    function renderForms() {
+      const siteRoot = document.getElementById('siteFields');
+      const projectRoot = document.getElementById('projectFields');
+      siteRoot.innerHTML = '';
+      projectRoot.innerHTML = '';
+
+      Object.entries(state.siteContent).forEach(([id, value]) => {
+        siteRoot.appendChild(makeSiteField(id, value));
+      });
+
+      Object.entries(state.projectContent).forEach(([projectKey, value]) => {
+        projectRoot.appendChild(makeProjectField(projectKey, value));
+      });
+
+      renderOutput();
+      postPreviewUpdate();
+    }
+
+    function unlockEditor() {
+      if (keyInput.value !== EDITOR_KEY) {
+        alert('Incorrect key.');
+        return;
+      }
+      sessionStorage.setItem('editorUnlocked', '1');
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      renderForms();
+    }
+
+    document.getElementById('unlock').addEventListener('click', unlockEditor);
+
+    if (sessionStorage.getItem('editorUnlocked') === '1') {
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      renderForms();
+    }
+
+    document.getElementById('copyConfig').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(document.getElementById('output').textContent);
+      alert('Copied config. Replace both objects in index.html.');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      state = {
+        siteContent: JSON.parse(JSON.stringify(defaultSiteContent)),
+        projectContent: JSON.parse(JSON.stringify(defaultProjectContent))
+      };
+      renderForms();
+    });
+  </script>
+</body>
+</html>
