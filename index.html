@@ -165,17 +165,22 @@
 
         /* --- 4. HERO --- */
         .hero {
-            height: 100vh; width: 100%; display: flex; flex-direction: column;
-            justify-content: center; align-items: flex-start; position: relative;
-            background-color: var(--bg-color); overflow: hidden;
+            min-height: min(88vh, 820px);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            padding: calc(var(--header-height) + 2rem) 0 3rem;
         }
         .hero-bg {
             position: absolute; 
             top: 0; 
-            /* Push to the right */
             right: 0; 
-            /* Limit width so it doesn't cover text (Adjust percentage to scale) */
-            width: 50%; 
+            width: 44%; 
             height: 100%;
             
             background-image: url('assets/images/M3_Main.png'); 
@@ -191,7 +196,7 @@
             z-index: 0;
         }
         .hero-container { position: relative; z-index: 2; width: 100%; max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
-        .hero-content { max-width: 900px; opacity: 0; transform: translateY(30px); transition: opacity 1s, transform 1s; }
+        .hero-content { max-width: 780px; opacity: 0; transform: translateY(30px); transition: opacity 1s, transform 1s; }
         .hero-content.visible { opacity: 1; transform: translateY(0); }
 
         .hero h1 { 
@@ -206,12 +211,50 @@
         
         .hero p { 
             font-family: var(--font-body); 
-            font-size: 1.25rem; 
+            font-size: 1.2rem; 
             color: var(--text-muted); 
-            margin-bottom: 3rem; 
+            margin-bottom: 2rem; 
             font-weight: 400; 
             max-width: 750px; 
             line-height: 1.7; 
+        }
+
+        .hero-kicker {
+            font-family: var(--font-body);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-stats {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 1rem;
+            max-width: 720px;
+        }
+
+        .hero-stat {
+            border: 1px solid var(--input-border);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem 1.1rem;
+        }
+
+        .hero-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .hero-stat-label {
+            margin-top: 0.45rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
         }
 
         .play-btn {
@@ -224,8 +267,8 @@
         .play-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); opacity: 0.9; }
 
         /* --- 5. GALLERY --- */
-        .gallery-section { padding: 6rem 0; background: var(--bg-color); transition: background 0.4s; }
-        .section-header { margin-bottom: 4rem; border-bottom: 1px solid var(--text-muted); padding-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; opacity: 0.5; }
+        .gallery-section { padding: 4.25rem 0; background: var(--bg-color); transition: background 0.4s; }
+        .section-header { margin-bottom: 2rem; border-bottom: 1px solid var(--text-muted); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end; opacity: 0.6; }
         
         .section-title { 
             font-family: var(--font-display); font-size: 1rem; 
@@ -255,74 +298,14 @@
         .project-card:hover .card-title { transform: translateY(0); }
         .card-action { font-family: var(--font-body); font-size: 0.8rem; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; text-transform: uppercase; }
 
-        /* --- 6. CONTACT FORM SECTION --- */
-        .contact-section {
-            padding: 6rem 0 8rem 0;
-            background: var(--bg-color);
-            transition: background 0.4s;
-            border-top: 1px solid var(--text-muted);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-        }
-
-        .contact-text h2 {
-            font-family: var(--font-display);
-            font-size: 3rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            letter-spacing: var(--tracking-display);
-        }
-
-        .contact-text p {
+        .card-meta {
+            margin-top: 0.5rem;
             font-family: var(--font-body);
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 400px;
-        }
-
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            padding: 1.2rem;
-            font-family: var(--font-body);
-            color: var(--text-main);
-            font-size: 1rem;
-            transition: border 0.3s, background 0.3s;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--text-main);
-        }
-
-        .submit-btn {
-            align-self: flex-start;
-            padding: 1rem 3rem;
-            background: var(--text-main);
-            color: var(--bg-color);
-            font-family: var(--font-display);
-            font-weight: 700;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s;
+            letter-spacing: 0.12em;
+            color: rgba(255, 255, 255, 0.8);
         }
-        
-        .submit-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
         /* --- 7. FLOATING PLAYER (PIP) --- */
         #floatingPlayer { 
@@ -393,6 +376,16 @@
             font-size: 1.1rem; line-height: 1.7;
         }
 
+        #modalMeta {
+            margin-top: 1.25rem;
+            display: grid;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
         .style-frames-header {
             font-family: var(--font-display); font-size: 1rem;
             text-transform: uppercase; letter-spacing: 0.1em;
@@ -443,9 +436,10 @@
         /* --- MOBILE --- */
         @media (max-width: 900px) {
             .container { padding: 0 2rem; }
+            .hero { min-height: auto; padding: calc(var(--header-height) + 1.5rem) 0 2rem; }
             .hero h1 { font-size: 4rem; }
+            .hero-stats { grid-template-columns: 1fr; max-width: 320px; }
             .gallery { grid-template-columns: 1fr; gap: 2rem; }
-            .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
             .project-details { grid-template-columns: 1fr; gap: 2rem; }
             .modal-container { padding: 4rem 1.5rem; }
             .close-modal { top: 1rem; right: 1.5rem; }
@@ -453,6 +447,7 @@
         @media (max-width: 600px) {
             .nav-links { display: none; }
             .hero-container { padding: 0 1.5rem; }
+            .hero-bg { width: 100%; opacity: 0.25; }
             .hero h1 { font-size: 2.8rem; }
             #floatingPlayer { width: 92vw; right: 4vw; bottom: 20px; }
             .footer-content { flex-direction: column; gap: 3rem; }
@@ -505,7 +500,6 @@
             <div class="nav-right">
                 <ul class="nav-links">
                     <li><a href="#work">Work</a></li>
-                    <li><a href="#contact">Contact</a></li>
                 </ul>
                 <button class="ui-btn" id="fontToggle" aria-label="Choose Font"><span class="font-label">Aa</span></button>
                 <button class="ui-btn" id="themeToggle" aria-label="Switch Theme">
@@ -530,9 +524,24 @@
         <div class="hero-bg"></div>
         <div class="hero-container">
             <div class="hero-content" id="hero-content">
-                <h1>Art Director &<br>Visual Artist</h1>
-                <p>I’m a jack-of-all-trades creative who blends motion design, 3D, VFX, and real-time tools. From Cinema 4D and Houdini to Unreal, Nuke, and After Effects, I build the visuals and design the pipeline that bring ideas to life.</p>
+                <div class="hero-kicker">Motion Graphics • Main Title Design • Visual Development</div>
+                <h1>Title Design for<br>Film, TV, & Games</h1>
+                <p>I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.</p>
                 <button class="play-btn" onclick="openFloatingReel('74537740')">▶ Watch Reel</button>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">15+</div>
+                        <div class="hero-stat-label">Years in design + VFX</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">20+</div>
+                        <div class="hero-stat-label">Major film / TV / game credits</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">End-to-End</div>
+                        <div class="hero-stat-label">Concept, design, animation, comp</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -542,33 +551,11 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Selected Works</h2>
-                <div class="section-title">2025</div>
+                <div class="section-title">Project Context + Contributions</div>
             </div>
             <div id="gallery-grid" class="gallery"></div>
         </div>
     </main>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact-section">
-        <div class="container contact-grid">
-            <div class="contact-text">
-                <h2>Get in touch</h2>
-                <p>Interested in working together? Fill out the form or send me a direct email to discuss your next project.</p>
-            </div>
-            <form action="mailto:mmurtha@gmail.com" method="post" enctype="text/plain" class="contact-form">
-                <div class="form-group">
-                    <input type="text" name="name" placeholder="Name" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" name="email" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Send Message</button>
-            </form>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer id="footer">
@@ -596,7 +583,10 @@
             <button class="close-modal" onclick="closeModal()">✕</button>
             <div id="videoContainer"></div> <!-- Dynamic container for videos -->
             <div class="project-details">
-                <div id="modalTitle">Project Title</div>
+                <div>
+                    <div id="modalTitle">Project Title</div>
+                    <div id="modalMeta"></div>
+                </div>
                 <div id="modalDesc">Project description goes here...</div>
             </div>
             <div class="style-frames-header">Style Frames</div>
@@ -633,91 +623,151 @@
             element.classList.add('active');
         }
 
-        // 3. PROJECT DATA (REORDERED & ZOETROPE REMOVED)
+        // 3. PROJECT DATA
         const projects = [
             {
                 title: "Wicked",
-                file: "assets/thumbs/WICKED.png", 
-                vimeo: "1142152199", 
-                description: "Magical atmosphere and particle effects design.",
+                file: "assets/thumbs/WICKED.png",
+                vimeo: "1142152199",
+                category: "Film Campaign",
+                role: "Motion Designer / Art Director",
+                year: "2024",
+                studio: "Campaign / AV",
+                deliverables: "Main-on-end graphics, transitions, atmospheric FX",
+                description: "Designed a fantasy-led motion language using particles, glows, and elegant transitions to match the film's magical tone.",
                 frames: ["assets/stills/wicked/wicked1.png", "assets/stills/wicked/wicked2.png", "assets/stills/wicked/wicked3.png"]
             },
             {
                 title: "Furiosa",
-                file: "assets/thumbs/FURIOSA.png", 
-                vimeo: ["1142155470", "1142155443"], 
-                description: "High-octane visual development.",
+                file: "assets/thumbs/FURIOSA.png",
+                vimeo: ["1142155470", "1142155443"],
+                category: "Film",
+                role: "Motion Designer",
+                year: "2024",
+                studio: "Entertainment Marketing",
+                deliverables: "Title cards, grit textures, kinetic transitions",
+                description: "Built aggressive visual treatments and typography timing for high-energy trailer moments and campaign assets.",
                 frames: ["assets/stills/furiosa/furiosa1.png", "assets/stills/furiosa/furiosa2.png", "assets/stills/furiosa/furiosa3.png"]
             },
-            { 
-                title: "The Flash", 
-                file: "FLASH.jpg", 
+            {
+                title: "The Flash",
+                file: "FLASH.jpg",
                 vimeo: "914963553",
-                description: "VFX Supervisor for the speed force sequences. Visualizing speed with electric, physical energy.",
+                category: "Feature Film",
+                role: "VFX Supervisor",
+                year: "2023",
+                studio: "Warner Bros.",
+                deliverables: "Speed force visuals, electric simulation beats",
+                description: "Supervised key speed force sequences with an emphasis on physical energy behavior and cinematic readability.",
                 frames: ["assets/stills/flash/flash1.png", "assets/stills/flash/flash2.png", "assets/stills/flash/flash3.png"]
             },
-            { 
-                title: "Ink", 
-                file: "INK2.jpg", 
-                vimeo: "915781397", 
-                description: "A personal exploration of fluid dynamics and ink in water, simulated entirely in 3D.", 
-                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"] 
+            {
+                title: "Ink",
+                file: "INK2.jpg",
+                vimeo: "915781397",
+                category: "R&D / Personal",
+                role: "Director + Animator",
+                year: "2023",
+                studio: "Independent",
+                deliverables: "Fluid simulation, look development",
+                description: "Personal R&D study focused on fluid dynamics, macro photography references, and stylized compositing.",
+                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"]
             },
-            { 
-                title: "Godzilla MW", 
-                file: "GODZILLAMW.png", 
-                vimeo: "913926442", 
-                description: "Design and animation for the Monsterverse integration. Heavy simulation work in Houdini.", 
-                frames: ["assets/stills/godzilla/gdzl01.png", "assets/stills/godzilla/gdzl02.png", "assets/stills/godzilla/gdzl03.png", "assets/stills/godzilla/gdzl04.png"] 
+            {
+                title: "Godzilla MW",
+                file: "GODZILLAMW.png",
+                vimeo: "913926442",
+                category: "Feature Integration",
+                role: "Lead Motion Designer",
+                year: "2022",
+                studio: "Legendary / Promo",
+                deliverables: "Creature-themed UI, destruction motifs",
+                description: "Designed and animated brand-integrated graphics with heavy Houdini simulation and compositing support.",
+                frames: ["assets/stills/godzilla/gdzl01.png", "assets/stills/godzilla/gdzl02.png", "assets/stills/godzilla/gdzl03.png", "assets/stills/godzilla/gdzl04.png"]
             },
-            { 
-                title: "Modern Warfare 3", 
-                file: "MW3.jpg", 
-                vimeo: "914962979", 
-                description: "UI and HUD design for in-game cinematics. Focused on a tactical, military-tech aesthetic.", 
-                frames: ["assets/stills/mw3/mwthree1.png", "assets/stills/mw3/mwthree2.png", "assets/stills/mw3/mwthree3.png"] 
+            {
+                title: "Modern Warfare 3",
+                file: "MW3.jpg",
+                vimeo: "914962979",
+                category: "Game Cinematics",
+                role: "UI / HUD Designer",
+                year: "2023",
+                studio: "Activision",
+                deliverables: "Mission UI, tactical overlays, data animation",
+                description: "Crafted militarized interface design for cinematic gameplay moments with clarity-first animation systems.",
+                frames: ["assets/stills/mw3/mwthree1.png", "assets/stills/mw3/mwthree2.png", "assets/stills/mw3/mwthree3.png"]
             },
-            { 
-                title: "She Hulk", 
-                file: "SHE_HULK_STILL.jpg", 
-                vimeo: "914963799", 
-                description: "Courtroom graphics and lower thirds design.", 
-                frames: ["assets/stills/shehulk/she1.png", "assets/stills/shehulk/she2.png", "assets/stills/shehulk/she3.png"] 
+            {
+                title: "She Hulk",
+                file: "SHE_HULK_STILL.jpg",
+                vimeo: "914963799",
+                category: "Series",
+                role: "Motion Graphics Designer",
+                year: "2022",
+                studio: "Marvel / Disney+",
+                deliverables: "Courtroom graphics, lower thirds, transitions",
+                description: "Developed courtroom-style informational graphics and lower thirds to support tone and legal-comedy pacing.",
+                frames: ["assets/stills/shehulk/she1.png", "assets/stills/shehulk/she2.png", "assets/stills/shehulk/she3.png"]
             },
-            { 
-                title: "Skeleton Crew", 
-                file: "SKELCREW.png", 
+            {
+                title: "Skeleton Crew",
+                file: "SKELCREW.png",
                 vimeo: "1141019603",
-                description: "Lead Motion Designer for this project. Focused on creating a gritty, textured look that matches the show's aesthetic.",
-                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"] 
+                category: "Series",
+                role: "Lead Motion Designer",
+                year: "2024",
+                studio: "Lucasfilm",
+                deliverables: "Textured motion language, episodic graphics",
+                description: "Led motion design direction focused on tactile textures, distressed typography, and world-consistent interface graphics.",
+                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"]
             },
-            { 
-                title: "Now You See Me 2", 
-                file: "NYSM2.png", 
-                vimeo: "913927393", 
-                description: "Visual effects for the card throwing sequences.", 
-                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"] 
+            {
+                title: "Now You See Me 2",
+                file: "NYSM2.png",
+                vimeo: "913927393",
+                category: "Feature Film",
+                role: "VFX Artist",
+                year: "2016",
+                studio: "Lionsgate",
+                deliverables: "Card trails, reveal composites",
+                description: "Designed and composited stylized card-throwing visuals with precision-timed FX for major illusion beats.",
+                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"]
             },
-            { 
-                title: "Jessica Jones", 
-                file: "JESSICAJONES.png", 
+            {
+                title: "Jessica Jones",
+                file: "JESSICAJONES.png",
                 vimeo: "914963591",
-                description: "Title sequence design inspired by noir detective comics and watercolor aesthetics.",
+                category: "Main Title",
+                role: "Title Designer",
+                year: "2015",
+                studio: "Marvel / Netflix",
+                deliverables: "Title sequence, painterly motion system",
+                description: "Created a noir comic-inspired title sequence blending watercolor textures with moody, investigative pacing.",
                 frames: ["assets/stills/jessicajones/jj01.png", "assets/stills/jessicajones/jj02.png", "assets/stills/jessicajones/jj03.png"]
             },
-            { 
-                title: "Kung Fu Panda", 
-                file: "KFP.jpg", 
-                vimeo: "914963679", 
-                description: "DreamWorks promotional package. Playful, energetic motion graphics.", 
-                frames: [] 
+            {
+                title: "Kung Fu Panda",
+                file: "KFP.jpg",
+                vimeo: "914963679",
+                category: "Animated Promo",
+                role: "Motion Designer",
+                year: "2016",
+                studio: "DreamWorks",
+                deliverables: "Broadcast package, energetic transitions",
+                description: "Developed a playful, high-tempo promo package with character-aligned timing and expressive graphic transitions.",
+                frames: []
             },
-            { 
-                title: "Rampage", 
-                file: "RAMPAGEOPEN.jpg", 
-                vimeo: "914970552", 
-                description: "Main title design featuring genetic mutation motifs.", 
-                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"] 
+            {
+                title: "Rampage",
+                file: "RAMPAGEOPEN.jpg",
+                vimeo: "914970552",
+                category: "Main Title",
+                role: "Title Designer",
+                year: "2018",
+                studio: "Warner Bros.",
+                deliverables: "Opening title sequence, mutation motifs",
+                description: "Designed a mutation-driven title sequence using biological forms, data overlays, and aggressive scale transitions.",
+                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"]
             }
         ];
 
@@ -740,6 +790,7 @@
                 <div class="card-overlay">
                     <div class="card-title">${proj.title}</div>
                     <div class="card-action">View Project</div>
+                    <div class="card-meta">${proj.category} • ${proj.role}</div>
                 </div>
             `;
             card.addEventListener('click', () => openModal(proj));
@@ -764,6 +815,7 @@
         const videoContainer = document.getElementById('videoContainer');
         const titleLabel = document.getElementById('modalTitle');
         const descLabel = document.getElementById('modalDesc');
+        const metaLabel = document.getElementById('modalMeta');
         const framesGrid = document.getElementById('framesGrid');
 
         function openModal(project) {
@@ -786,6 +838,7 @@
 
             titleLabel.innerText = project.title;
             descLabel.innerText = project.description;
+            metaLabel.innerHTML = `<div>${project.role} • ${project.category}</div><div>${project.year} • ${project.studio}</div><div>${project.deliverables}</div>`;
 
             framesGrid.innerHTML = ''; 
             if(project.frames && project.frames.length > 0) {
