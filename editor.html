@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Private Site Editor</title>
+  <script>
+    if (window.self !== window.top) {
+      window.location.replace('index.html');
+    }
+  </script>
   <style>
     :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
     * { box-sizing: border-box; }
@@ -62,7 +67,7 @@
 
       <pre id="output"></pre>
     </section>
-    <section class="right"><iframe id="preview" src="index.html"></iframe></section>
+    <section class="right"><iframe id="preview" src="/index.html"></iframe></section>
   </main>
 
   <script>
