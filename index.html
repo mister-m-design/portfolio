@@ -651,9 +651,28 @@
             });
         }
 
-        applySiteContent(siteContent);
+        const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
 
-        const projectContentOverrides = {};
+        function loadPersistedEditorState() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(EDITOR_STATE_KEY) || '{}');
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch {
+                return {};
+            }
+        }
+
+        function persistEditorState(nextState) {
+            localStorage.setItem(EDITOR_STATE_KEY, JSON.stringify(nextState));
+        }
+
+        const initialEditorState = loadPersistedEditorState();
+        if (initialEditorState.siteContent) {
+            siteContent = initialEditorState.siteContent;
+        }
+        let projectContentOverrides = initialEditorState.projectOverrides || {};
+
+        applySiteContent(siteContent);
 
         function applyProjectOverrides(sourceProjects, overrides = {}) {
             return sourceProjects.map((project) => {
@@ -687,15 +706,23 @@
             }, {});
         }
 
-        function applyEditorPreviewUpdate(payload = {}) {
+        function applyEditorPreviewUpdate(payload = {}, shouldPersist = false) {
             if (payload.siteContent) {
                 siteContent = payload.siteContent;
                 applySiteContent(siteContent);
             }
 
             if (payload.projectOverrides) {
-                projects = applyProjectOverrides(baseProjects, payload.projectOverrides);
+                projectContentOverrides = payload.projectOverrides;
+                projects = applyProjectOverrides(baseProjects, projectContentOverrides);
                 renderGallery();
+            }
+
+            if (shouldPersist) {
+                persistEditorState({
+                    siteContent,
+                    projectOverrides: projectContentOverrides
+                });
             }
         }
 
@@ -709,7 +736,7 @@
         window.addEventListener('message', (event) => {
             const data = event.data || {};
             if (data.type !== 'portfolio-preview-update') return;
-            applyEditorPreviewUpdate(data.payload);
+            applyEditorPreviewUpdate(data.payload, true);
         });
 
         // 4. PROJECT DATA
@@ -889,6 +916,14 @@
         }
 
         renderGallery();
+
+        window.addEventListener('storage', (event) => {
+            if (event.key !== EDITOR_STATE_KEY || !event.newValue) return;
+            try {
+                const nextState = JSON.parse(event.newValue);
+                applyEditorPreviewUpdate(nextState, false);
+            } catch {}
+        });
 
         // 6. LOAD ANIMATION
         window.addEventListener('load', () => { document.getElementById('hero-content').classList.add('visible'); });
