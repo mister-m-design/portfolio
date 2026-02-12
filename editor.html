@@ -71,7 +71,7 @@
 
       <pre id="output"></pre>
     </section>
-    <section class="right"><iframe id="preview" src="/index.html"></iframe></section>
+    <section class="right"><iframe id="preview" src="index.html"></iframe></section>
   </main>
 
   <script>
@@ -81,10 +81,13 @@
     const app = document.getElementById('app');
     const keyInput = document.getElementById('key');
     const preview = document.getElementById('preview');
+    const INDEX_URL = new URL('index.html', window.location.href).toString();
     const saveStatus = document.getElementById('saveStatus');
     const editorChannel = typeof BroadcastChannel !== 'undefined'
       ? new BroadcastChannel('mrm_editor_channel')
       : null;
+
+    preview.src = INDEX_URL;
 
     const defaultSiteContent = {
       brandName: { text: 'Michael Rush Murtha', size: 1.1 },
@@ -164,7 +167,7 @@
             siteContent: state.siteContent,
             projectOverrides: state.projectContent
           }
-        }, window.location.origin);
+        }, "*");
       } catch {}
     }
 
@@ -278,7 +281,7 @@
     }
 
     async function fetchCurrentIndexHtml() {
-      const res = await fetch('/index.html', { cache: 'no-store' });
+      const res = await fetch(INDEX_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('Could not load index.html');
       return await res.text();
     }
@@ -307,6 +310,10 @@
 
     document.getElementById('unlock').addEventListener('click', unlockEditor);
 
+    preview.addEventListener('load', () => {
+      postPreviewUpdate();
+    });
+
     if (sessionStorage.getItem('editorUnlocked') === '1') {
       loadSavedState();
       gate.classList.add('hidden');
@@ -332,7 +339,7 @@
     });
 
     document.getElementById('openSiteBtn').addEventListener('click', () => {
-      window.open('/index.html', '_blank');
+      window.open(INDEX_URL, '_blank');
     });
 
 
