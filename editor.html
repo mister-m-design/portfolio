@@ -11,151 +11,168 @@
   </script>
   <style>
     :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family: Inter, system-ui, sans-serif; background:var(--bg); color:var(--text); }
-    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
     .hidden { display:none !important; }
-    .shell { display:grid; grid-template-columns: 460px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
-    .left { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
-    .right { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+
+    .shell { display:grid; grid-template-columns:460px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
+    .shell.collapsed { grid-template-columns:320px 1fr; }
+    .panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
+    .preview { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+
     h1 { font-size:1.08rem; margin:.1rem 0; }
+    h2 { margin:0 0 .5rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
     .muted { color:var(--muted); font-size:.84rem; }
+    .actions { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:.55rem; }
+    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
+    button.primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
     .section { margin-top:1rem; border-top:1px solid var(--border); padding-top:.8rem; }
-    .section h2 { margin:0 0 .55rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
     .field { border:1px solid var(--border); border-radius:9px; padding:.55rem; margin-bottom:.55rem; background:#11131a; }
-    .label { display:block; font-size:.72rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.35rem; }
-    input[type='text'], textarea, input[type='password'] { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.5rem .6rem; }
-    textarea { min-height:78px; resize:vertical; }
+    .label { display:block; font-size:.72rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.3rem; }
+    input, textarea { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.45rem .6rem; }
+    textarea { min-height:70px; resize:vertical; }
     .size { display:grid; grid-template-columns:1fr auto; gap:.45rem; align-items:center; margin-top:.45rem; }
     input[type='range'] { width:100%; accent-color:var(--accent); }
     .pill { border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.72rem; padding:.2rem .45rem; min-width:64px; text-align:center; }
-    .actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem; }
-    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
-    .primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
+    .project-card-editor { border:1px solid var(--border); border-radius:10px; padding:.6rem; margin-bottom:.6rem; background:#10131b; }
+    .project-header { display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.5rem; }
+    .project-title { font-size:.86rem; font-weight:700; }
+    .drag-handle { cursor:grab; color:var(--muted); user-select:none; }
+    .project-row { display:grid; grid-template-columns: 1fr 1fr; gap:.4rem; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:.7rem; }
     iframe { width:100%; height:100%; border:0; }
-    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.6rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
-    @media (max-width: 1100px) { .shell { grid-template-columns:1fr; } .right { min-height:70vh; } .left { max-height:none; } }
+    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.7rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
+    @media (max-width: 1200px) { .shell { grid-template-columns:1fr; } .preview { min-height:65vh; } .panel { max-height:none; } }
   </style>
 </head>
 <body>
   <div id="gate" class="gate">
     <h1>Private editor</h1>
-    <p class="muted">Separate from homepage. Enter your key to unlock the editor and live preview.</p>
+    <p class="muted">Unlock your CMS panel for live editing, previewing, and publishing.</p>
     <label class="label" for="key">Editor key</label>
     <input id="key" type="password" />
     <div class="actions"><button id="unlock" class="primary">Unlock</button></div>
   </div>
 
   <main id="app" class="shell hidden">
-    <section class="left">
-      <h1>Site Content Editor</h1>
-      <p class="muted">All fields are always visible here. Edits are saved locally and applied live to the preview + your site in this browser.</p>
+    <section id="cmsPanel" class="panel">
+      <div class="toolbar">
+        <h1>Portfolio CMS</h1>
+        <button id="togglePanelBtn">Wider preview</button>
+      </div>
+      <p class="muted">Live preview updates while typing. Save persists state. Apply/Download publishes to real file.</p>
+
       <div class="actions">
         <button id="saveBtn" class="primary">Save edits</button>
         <button id="applyFileBtn">Apply to index.html file</button>
         <button id="downloadIndexBtn">Download updated index.html</button>
         <button id="resetBtn">Reset defaults</button>
         <button id="openSiteBtn">Open site</button>
+        <button id="inlineToggleBtn">Inline edit preview text</button>
+        <button id="addProjectBtn">Add project</button>
         <span id="saveStatus" class="muted" style="align-self:center;">Ready</span>
       </div>
 
       <div class="section">
-        <h2>Main site text</h2>
+        <h2>Site text</h2>
         <div id="siteFields"></div>
       </div>
 
       <div class="section">
-        <h2>Project image text (cards + modal)</h2>
+        <h2>Work items (drag to reorder)</h2>
         <div id="projectFields"></div>
       </div>
 
       <pre id="output"></pre>
     </section>
-    <section class="right"><iframe id="preview" src="index.html"></iframe></section>
+
+    <section class="preview">
+      <iframe id="preview" src="index.html"></iframe>
+    </section>
   </main>
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
+    const INDEX_URL = new URL('index.html', window.location.href).toString();
+
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
     const keyInput = document.getElementById('key');
     const preview = document.getElementById('preview');
-    const INDEX_URL = new URL('index.html', window.location.href).toString();
     const saveStatus = document.getElementById('saveStatus');
-    const editorChannel = typeof BroadcastChannel !== 'undefined'
-      ? new BroadcastChannel('mrm_editor_channel')
-      : null;
+    const projectFields = document.getElementById('projectFields');
+    const editorChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('mrm_editor_channel') : null;
+
+    let inlineEditEnabled = false;
+    let dragSourceKey = null;
 
     preview.src = INDEX_URL;
 
-    const defaultSiteContent = {
-      brandName: { text: 'Michael Rush Murtha', size: 1.1 },
-      heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
-      heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
-      heroDescription: { text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.', size: 1.2 },
-      heroCta: { text: '▶ Watch Reel', size: 0.9 },
-      heroStat1Value: { text: '15+', size: 1.6 },
-      heroStat1Label: { text: 'Years in design + VFX', size: 0.7 },
-      heroStat2Value: { text: '20+', size: 1.6 },
-      heroStat2Label: { text: 'Major film / TV / game credits', size: 0.7 },
-      heroStat3Value: { text: 'End-to-End', size: 1.6 },
-      heroStat3Label: { text: 'Concept, design, animation, comp', size: 0.7 },
-      workHeading: { text: 'Selected Works', size: 1 },
-      workSubheading: { text: 'Project Context + Contributions', size: 1 },
-      framesHeader: { text: 'Style Frames', size: 1 },
-      footerEmail: { text: 'mmurtha@gmail.com', size: 1.2 },
-      copyrightText: { text: '&copy; 2024 Michael Rush Murtha', size: 0.8 }
-    };
+    let state = { siteContent: {}, projectContent: {} };
 
-    const defaultProjectContent = {
-      'assets/thumbs/WICKED.png': { title: 'Wicked', category: 'Film Campaign', role: 'Motion Designer / Art Director', year: '2024', studio: 'Campaign / AV', deliverables: 'Main-on-end graphics, transitions, atmospheric FX', description: "Designed a fantasy-led motion language using particles, glows, and elegant transitions to match the film's magical tone." },
-      'assets/thumbs/FURIOSA.png': { title: 'Furiosa', category: 'Film', role: 'Motion Designer', year: '2024', studio: 'Entertainment Marketing', deliverables: 'Title cards, grit textures, kinetic transitions', description: 'Built aggressive visual treatments and typography timing for high-energy trailer moments and campaign assets.' },
-      'FLASH.jpg': { title: 'The Flash', category: 'Feature Film', role: 'VFX Supervisor', year: '2023', studio: 'Warner Bros.', deliverables: 'Speed force visuals, electric simulation beats', description: 'Supervised key speed force sequences with an emphasis on physical energy behavior and cinematic readability.' },
-      'INK2.jpg': { title: 'Ink', category: 'R&D / Personal', role: 'Director + Animator', year: '2023', studio: 'Independent', deliverables: 'Fluid simulation, look development', description: 'Personal R&D study focused on fluid dynamics, macro photography references, and stylized compositing.' },
-      'GODZILLAMW.png': { title: 'Godzilla MW', category: 'Feature Integration', role: 'Lead Motion Designer', year: '2022', studio: 'Legendary / Promo', deliverables: 'Creature-themed UI, destruction motifs', description: 'Designed and animated brand-integrated graphics with heavy Houdini simulation and compositing support.' },
-      'MW3.jpg': { title: 'Modern Warfare 3', category: 'Game Cinematics', role: 'UI / HUD Designer', year: '2023', studio: 'Activision', deliverables: 'Mission UI, tactical overlays, data animation', description: 'Crafted militarized interface design for cinematic gameplay moments with clarity-first animation systems.' },
-      'SHE_HULK_STILL.jpg': { title: 'She Hulk', category: 'Series', role: 'Motion Graphics Designer', year: '2022', studio: 'Marvel / Disney+', deliverables: 'Courtroom graphics, lower thirds, transitions', description: 'Developed courtroom-style informational graphics and lower thirds to support tone and legal-comedy pacing.' },
-      'SKELCREW.png': { title: 'Skeleton Crew', category: 'Series', role: 'Lead Motion Designer', year: '2024', studio: 'Lucasfilm', deliverables: 'Textured motion language, episodic graphics', description: 'Led motion design direction focused on tactile textures, distressed typography, and world-consistent interface graphics.' },
-      'NYSM2.png': { title: 'Now You See Me 2', category: 'Feature Film', role: 'VFX Artist', year: '2016', studio: 'Lionsgate', deliverables: 'Card trails, reveal composites', description: 'Designed and composited stylized card-throwing visuals with precision-timed FX for major illusion beats.' },
-      'JESSICAJONES.png': { title: 'Jessica Jones', category: 'Main Title', role: 'Title Designer', year: '2015', studio: 'Marvel / Netflix', deliverables: 'Title sequence, painterly motion system', description: 'Created a noir comic-inspired title sequence blending watercolor textures with moody, investigative pacing.' },
-      'KFP.jpg': { title: 'Kung Fu Panda', category: 'Animated Promo', role: 'Motion Designer', year: '2016', studio: 'DreamWorks', deliverables: 'Broadcast package, energetic transitions', description: 'Developed a playful, high-tempo promo package with character-aligned timing and expressive graphic transitions.' },
-      'RAMPAGEOPEN.jpg': { title: 'Rampage', category: 'Main Title', role: 'Title Designer', year: '2018', studio: 'Warner Bros.', deliverables: 'Opening title sequence, mutation motifs', description: 'Designed a mutation-driven title sequence using biological forms, data overlays, and aggressive scale transitions.' }
-    };
+    function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
-    let state = {
-      siteContent: JSON.parse(JSON.stringify(defaultSiteContent)),
-      projectContent: JSON.parse(JSON.stringify(defaultProjectContent))
-    };
+    function defaultStateFromSnapshot(snapshot) {
+      return {
+        siteContent: snapshot.siteContent || {},
+        projectContent: snapshot.projectContent || {}
+      };
+    }
+
+    function parseVimeo(value) {
+      if (typeof value !== 'string') return value;
+      const parts = value.split(',').map(v => v.trim()).filter(Boolean);
+      const ids = parts.map((part) => {
+        const m = part.match(/(?:vimeo\.com\/(?:video\/)?)(\d+)/i);
+        return m ? m[1] : part;
+      });
+      return ids.length > 1 ? ids.join(', ') : (ids[0] || '');
+    }
+
+    function normalizeProject(project, fallbackOrder = 0) {
+      return {
+        title: project.title || 'Untitled Project',
+        category: project.category || '',
+        role: project.role || '',
+        year: project.year || '',
+        studio: project.studio || '',
+        deliverables: project.deliverables || '',
+        description: project.description || '',
+        file: project.file || '',
+        vimeo: typeof project.vimeo === 'string' ? project.vimeo : Array.isArray(project.vimeo) ? project.vimeo.join(', ') : '',
+        frames: typeof project.frames === 'string' ? project.frames : Array.isArray(project.frames) ? project.frames.join(', ') : '',
+        order: Number.isFinite(Number(project.order)) ? Number(project.order) : fallbackOrder,
+        deleted: !!project.deleted
+      };
+    }
 
     function loadSavedState() {
       try {
         const parsed = JSON.parse(localStorage.getItem(EDITOR_STATE_KEY) || '{}');
         if (parsed.siteContent && parsed.projectOverrides) {
-          state = {
-            siteContent: parsed.siteContent,
-            projectContent: parsed.projectOverrides
-          };
+          state.siteContent = parsed.siteContent;
+          state.projectContent = Object.fromEntries(
+            Object.entries(parsed.projectOverrides).map(([k, v], i) => [k, normalizeProject(v, i)])
+          );
         }
       } catch {}
     }
 
-    function saveState() {
+    function saveState(status = 'Saved') {
       localStorage.setItem(EDITOR_STATE_KEY, JSON.stringify({
         siteContent: state.siteContent,
         projectOverrides: state.projectContent
       }));
-      if (saveStatus) saveStatus.textContent = 'Saved';
+      if (saveStatus) saveStatus.textContent = status;
     }
 
     function broadcastState() {
       if (!editorChannel) return;
       editorChannel.postMessage({
         type: 'editor-state-update',
-        payload: {
-          siteContent: state.siteContent,
-          projectOverrides: state.projectContent
-        }
+        payload: { siteContent: state.siteContent, projectOverrides: state.projectContent }
       });
     }
 
@@ -163,11 +180,8 @@
       try {
         preview.contentWindow.postMessage({
           type: 'portfolio-preview-update',
-          payload: {
-            siteContent: state.siteContent,
-            projectOverrides: state.projectContent
-          }
-        }, "*");
+          payload: { siteContent: state.siteContent, projectOverrides: state.projectContent }
+        }, '*');
       } catch {}
     }
 
@@ -176,20 +190,23 @@
 `let siteContent = ${JSON.stringify(state.siteContent, null, 2)};\n\nlet projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
     }
 
+    function pushAll(status='Saved') {
+      saveState(status);
+      renderOutput();
+      postPreviewUpdate();
+      broadcastState();
+    }
+
     function makeSiteField(id, value) {
       const box = document.createElement('div');
       box.className = 'field';
       box.innerHTML = `<label class="label">${id}</label>`;
 
       const input = document.createElement('textarea');
-      input.value = value.text;
+      input.value = value.text || '';
       input.addEventListener('input', () => {
         state.siteContent[id].text = input.value;
-        if (saveStatus) saveStatus.textContent = 'Saving…';
-        renderOutput();
-        saveState();
-        postPreviewUpdate();
-        broadcastState();
+        pushAll('Saving…');
       });
 
       const row = document.createElement('div');
@@ -203,78 +220,159 @@
       const pill = document.createElement('span');
       pill.className = 'pill';
       pill.textContent = `${range.value}rem`;
-
       range.addEventListener('input', () => {
         state.siteContent[id].size = Number(range.value);
-        if (saveStatus) saveStatus.textContent = 'Saving…';
         pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
-        renderOutput();
-        saveState();
-        postPreviewUpdate();
-        broadcastState();
+        pushAll('Saving…');
       });
-
-      row.appendChild(range);
-      row.appendChild(pill);
-      box.appendChild(input);
-      box.appendChild(row);
+      row.append(range, pill);
+      box.append(input, row);
       return box;
     }
 
-    function makeProjectField(projectKey, value) {
-      const box = document.createElement('div');
-      box.className = 'field';
-      box.innerHTML = `<label class="label">${value.title} <span class="muted">(${projectKey})</span></label>`;
+    function sortedProjectEntries() {
+      return Object.entries(state.projectContent)
+        .sort((a, b) => Number(a[1].order || 0) - Number(b[1].order || 0));
+    }
 
-      ['title', 'category', 'role', 'year', 'studio', 'deliverables', 'description'].forEach((fieldKey) => {
-        const label = document.createElement('label');
-        label.className = 'label';
-        label.textContent = fieldKey;
+    function updateProjectOrder(keys) {
+      keys.forEach((key, idx) => {
+        if (!state.projectContent[key]) return;
+        state.projectContent[key].order = idx;
+      });
+      pushAll('Saved');
+      renderProjectFields();
+    }
 
-        const input = document.createElement(fieldKey === 'description' ? 'textarea' : 'input');
-        if (fieldKey !== 'description') input.type = 'text';
-        input.value = value[fieldKey] || '';
-        input.addEventListener('input', () => {
-          state.projectContent[projectKey][fieldKey] = input.value;
-          if (saveStatus) saveStatus.textContent = 'Saving…';
-          renderOutput();
-          saveState();
-          postPreviewUpdate();
-          broadcastState();
-        });
+    function moveProject(key, dir) {
+      const keys = sortedProjectEntries().map(([k]) => k);
+      const i = keys.indexOf(key);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= keys.length) return;
+      [keys[i], keys[j]] = [keys[j], keys[i]];
+      updateProjectOrder(keys);
+    }
 
-        box.appendChild(label);
-        box.appendChild(input);
+    function makeField(labelText, value, onInput, type='text') {
+      const label = document.createElement('label');
+      label.className = 'label';
+      label.textContent = labelText;
+      const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+      if (type !== 'textarea') input.type = type;
+      input.value = value ?? '';
+      input.addEventListener('input', () => onInput(input.value));
+      return [label, input];
+    }
+
+    function makeProjectCard(projectKey, project) {
+      const card = document.createElement('div');
+      card.className = 'project-card-editor';
+      card.draggable = true;
+      card.dataset.key = projectKey;
+
+      card.addEventListener('dragstart', () => { dragSourceKey = projectKey; card.style.opacity = '0.5'; });
+      card.addEventListener('dragend', () => { card.style.opacity = '1'; });
+      card.addEventListener('dragover', (e) => e.preventDefault());
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!dragSourceKey || dragSourceKey === projectKey) return;
+        const keys = sortedProjectEntries().map(([k]) => k);
+        const from = keys.indexOf(dragSourceKey);
+        const to = keys.indexOf(projectKey);
+        keys.splice(to, 0, keys.splice(from, 1)[0]);
+        updateProjectOrder(keys);
       });
 
-      return box;
+      const header = document.createElement('div');
+      header.className = 'project-header';
+      header.innerHTML = `<div class="project-title">${project.title}</div><div class="drag-handle">⠿ drag</div>`;
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const up = document.createElement('button'); up.textContent = 'Move up'; up.type='button'; up.onclick = () => moveProject(projectKey, -1);
+      const down = document.createElement('button'); down.textContent = 'Move down'; down.type='button'; down.onclick = () => moveProject(projectKey, 1);
+      const del = document.createElement('button'); del.textContent = project.deleted ? 'Restore' : 'Delete'; del.type='button';
+      del.onclick = () => { state.projectContent[projectKey].deleted = !state.projectContent[projectKey].deleted; pushAll('Saved'); renderProjectFields(); };
+      actions.append(up, down, del);
+
+      const body = document.createElement('div');
+      body.className = 'project-row';
+
+      const fields = [
+        ['title', 'text'], ['category', 'text'], ['role', 'text'], ['year', 'text'], ['studio', 'text'],
+        ['deliverables', 'text'], ['description', 'textarea'], ['file', 'text'], ['vimeo', 'text'], ['frames', 'text'], ['order', 'number']
+      ];
+
+      fields.forEach(([key, type]) => {
+        const [label, input] = makeField(key, project[key], (val) => {
+          state.projectContent[projectKey][key] = key === 'order' ? Number(val || 0) : (key === 'vimeo' ? parseVimeo(val) : val);
+          pushAll('Saving…');
+          if (key === 'order') renderProjectFields();
+        }, type);
+        body.append(label, input);
+      });
+
+      card.append(header, actions, body);
+      if (project.deleted) card.style.opacity = '0.5';
+      return card;
+    }
+
+    function renderProjectFields() {
+      projectFields.innerHTML = '';
+      sortedProjectEntries().forEach(([key, value]) => {
+        projectFields.appendChild(makeProjectCard(key, value));
+      });
     }
 
     function renderForms() {
       const siteRoot = document.getElementById('siteFields');
-      const projectRoot = document.getElementById('projectFields');
       siteRoot.innerHTML = '';
-      projectRoot.innerHTML = '';
-
-      Object.entries(state.siteContent).forEach(([id, value]) => {
-        siteRoot.appendChild(makeSiteField(id, value));
-      });
-
-      Object.entries(state.projectContent).forEach(([projectKey, value]) => {
-        projectRoot.appendChild(makeProjectField(projectKey, value));
-      });
-
-      renderOutput();
-      saveState();
-      postPreviewUpdate();
-      broadcastState();
+      Object.entries(state.siteContent).forEach(([id, value]) => siteRoot.appendChild(makeSiteField(id, value)));
+      renderProjectFields();
+      pushAll('Saved');
     }
 
+    function setInlineEditable(doc, id, enabled) {
+      const el = doc.getElementById(id);
+      if (!el) return;
+      el.contentEditable = enabled ? 'true' : 'false';
+      el.style.outline = enabled ? '1px dashed #8ea0ff' : '';
+      if (!enabled) return;
+      el.oninput = () => {
+        if (!state.siteContent[id]) return;
+        state.siteContent[id].text = el.innerHTML;
+        pushAll('Saving…');
+      };
+    }
+
+    function setInlineProjectEditable(doc, enabled) {
+      const titles = doc.querySelectorAll('.project-card .card-title');
+      titles.forEach((node) => {
+        const key = node.closest('.project-card')?.dataset?.projectKey;
+        if (!key || !state.projectContent[key]) return;
+        node.contentEditable = enabled ? 'true' : 'false';
+        node.style.outline = enabled ? '1px dashed #8ea0ff' : '';
+        if (!enabled) return;
+        node.oninput = () => {
+          state.projectContent[key].title = node.innerText;
+          pushAll('Saving…');
+          renderProjectFields();
+        };
+      });
+    }
+
+    function toggleInlineEdit() {
+      const doc = preview.contentDocument;
+      if (!doc) { alert('Preview not ready yet.'); return; }
+      inlineEditEnabled = !inlineEditEnabled;
+      Object.keys(state.siteContent).forEach((id) => setInlineEditable(doc, id, inlineEditEnabled));
+      setInlineProjectEditable(doc, inlineEditEnabled);
+      document.getElementById('inlineToggleBtn').textContent = inlineEditEnabled ? 'Disable inline edit' : 'Inline edit preview text';
+    }
 
     function buildUpdatedIndexHtml(sourceHtml) {
       const nextSite = `let siteContent = ${JSON.stringify(state.siteContent, null, 2)};`;
       const nextProjects = `let projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
-
       let updated = sourceHtml.replace(/let\s+siteContent\s*=\s*\{[\s\S]*?\};/, nextSite);
       updated = updated.replace(/let\s+projectContentOverrides\s*=\s*\{[\s\S]*?\};/, nextProjects);
       return updated;
@@ -295,22 +393,29 @@
       a.click();
       URL.revokeObjectURL(url);
     }
+
+    async function hydrateFromPreview() {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return;
+      const snap = snapshotFn();
+      state = defaultStateFromSnapshot(snap);
+      state.projectContent = Object.fromEntries(Object.entries(state.projectContent).map(([k, v], i) => [k, normalizeProject(v, i)]));
+      renderForms();
+    }
+
     function unlockEditor() {
-      if (keyInput.value !== EDITOR_KEY) {
-        alert('Incorrect key.');
-        return;
-      }
+      if (keyInput.value !== EDITOR_KEY) { alert('Incorrect key.'); return; }
       sessionStorage.setItem('editorUnlocked', '1');
       loadSavedState();
       gate.classList.add('hidden');
       app.classList.remove('hidden');
       renderForms();
-      broadcastState();
     }
 
     document.getElementById('unlock').addEventListener('click', unlockEditor);
 
-    preview.addEventListener('load', () => {
+    preview.addEventListener('load', async () => {
+      await hydrateFromPreview();
       postPreviewUpdate();
     });
 
@@ -322,67 +427,58 @@
     }
 
     document.getElementById('saveBtn').addEventListener('click', () => {
-      if (saveStatus) saveStatus.textContent = 'Saving…';
-      saveState();
-      postPreviewUpdate();
-      broadcastState();
+      pushAll('Saved');
       alert('Saved locally and pushed live to preview/open tabs.');
     });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      localStorage.removeItem(EDITOR_STATE_KEY);
-      state = {
-        siteContent: JSON.parse(JSON.stringify(defaultSiteContent)),
-        projectContent: JSON.parse(JSON.stringify(defaultProjectContent))
-      };
-      renderForms();
-    });
-
-    document.getElementById('openSiteBtn').addEventListener('click', () => {
-      window.open(INDEX_URL, '_blank');
-    });
-
 
     document.getElementById('applyFileBtn').addEventListener('click', async () => {
       if (!window.showOpenFilePicker) {
         alert('Direct file apply is not supported in this browser. Use Download updated index.html instead.');
         return;
       }
-
       try {
         const [fileHandle] = await window.showOpenFilePicker({
-          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }],
-          excludeAcceptAllOption: false,
-          multiple: false
+          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }], multiple: false
         });
-
         const file = await fileHandle.getFile();
-        const source = await file.text();
-        const updated = buildUpdatedIndexHtml(source);
-
+        const updated = buildUpdatedIndexHtml(await file.text());
         const writable = await fileHandle.createWritable();
-        await writable.write(updated);
-        await writable.close();
-
-        if (saveStatus) saveStatus.textContent = 'Applied to file';
-        alert('Applied edits directly to selected index.html file.');
+        await writable.write(updated); await writable.close();
+        saveStatus.textContent = 'Applied to file';
       } catch (error) {
-        if (error && error.name === 'AbortError') return;
-        alert(`Apply failed: ${error.message}`);
+        if (error?.name !== 'AbortError') alert(`Apply failed: ${error.message}`);
       }
     });
 
     document.getElementById('downloadIndexBtn').addEventListener('click', async () => {
       try {
-        const source = await fetchCurrentIndexHtml();
-        const updated = buildUpdatedIndexHtml(source);
+        const updated = buildUpdatedIndexHtml(await fetchCurrentIndexHtml());
         downloadTextFile('index.html', updated);
-        if (saveStatus) saveStatus.textContent = 'Downloaded index.html';
+        saveStatus.textContent = 'Downloaded index.html';
       } catch (error) {
         alert(`Download failed: ${error.message}`);
       }
     });
 
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      localStorage.removeItem(EDITOR_STATE_KEY);
+      preview.contentWindow?.localStorage?.removeItem(EDITOR_STATE_KEY);
+      window.location.reload();
+    });
+
+    document.getElementById('openSiteBtn').addEventListener('click', () => window.open(INDEX_URL, '_blank'));
+    document.getElementById('inlineToggleBtn').addEventListener('click', toggleInlineEdit);
+    document.getElementById('addProjectBtn').addEventListener('click', () => {
+      const key = `custom:${Date.now()}`;
+      state.projectContent[key] = normalizeProject({ title: 'New Project', file: '', vimeo: '', frames: '', order: Object.keys(state.projectContent).length }, Object.keys(state.projectContent).length);
+      renderForms();
+    });
+
+    document.getElementById('togglePanelBtn').addEventListener('click', () => {
+      app.classList.toggle('collapsed');
+      const collapsed = app.classList.contains('collapsed');
+      document.getElementById('togglePanelBtn').textContent = collapsed ? 'Wider panel' : 'Wider preview';
+    });
   </script>
 </body>
 </html>
