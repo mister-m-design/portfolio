@@ -3,135 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private Site Editor</title>
-  <script>
-    if (window.self !== window.top) {
-      window.location.replace('index.html');
-    }
-  </script>
+  <title>Private CMS Editor</title>
   <style>
-    :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
-    .hidden { display:none !important; }
-    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+    :root {
+      --bg: #0b0c11;
+      --panel: #141823;
+      --border: #2f3649;
+      --text: #ecf0ff;
+      --muted: #9ea7be;
+      --accent: #95a1ff;
+      --ok: #84f0b4;
+      --warn: #ffd08a;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .hidden { display: none !important; }
 
-    .shell { display:grid; grid-template-columns:460px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
-    .shell.collapsed { grid-template-columns:320px 1fr; }
-    .panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
-    .preview { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+    .gate {
+      max-width: 420px;
+      margin: 14vh auto;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 1rem;
+    }
 
-    h1 { font-size:1.08rem; margin:.1rem 0; }
-    h2 { margin:0 0 .5rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
-    .muted { color:var(--muted); font-size:.84rem; }
-    .actions { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:.55rem; }
-    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
-    button.primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
-    .section { margin-top:1rem; border-top:1px solid var(--border); padding-top:.8rem; }
-    .field { border:1px solid var(--border); border-radius:9px; padding:.55rem; margin-bottom:.55rem; background:#11131a; }
-    .label { display:block; font-size:.72rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.3rem; }
-    input, textarea { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.45rem .6rem; }
-    textarea { min-height:70px; resize:vertical; }
-    .size { display:grid; grid-template-columns:1fr auto; gap:.45rem; align-items:center; margin-top:.45rem; }
-    input[type='range'] { width:100%; accent-color:var(--accent); }
-    .pill { border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.72rem; padding:.2rem .45rem; min-width:64px; text-align:center; }
-    .project-card-editor { border:1px solid var(--border); border-radius:10px; padding:.6rem; margin-bottom:.6rem; background:#10131b; }
-    .project-header { display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.5rem; }
-    .project-title { font-size:.86rem; font-weight:700; }
-    .drag-handle { cursor:grab; color:var(--muted); user-select:none; }
-    .project-row { display:grid; grid-template-columns: 1fr 1fr; gap:.4rem; }
-    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:.7rem; }
-    iframe { width:100%; height:100%; border:0; }
-    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.7rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
-    @media (max-width: 1200px) { .shell { grid-template-columns:1fr; } .preview { min-height:65vh; } .panel { max-height:none; } }
+    .editor-shell { min-height: 100vh; position: relative; }
+    iframe { width: 100vw; height: 100vh; border: 0; display: block; background: #030303; }
+
+    .dock {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 50;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 35, 0.95);
+      backdrop-filter: blur(6px);
+      border-radius: 12px;
+      padding: 0.65rem;
+      width: min(92vw, 520px);
+    }
+
+    .dock h1 { font-size: 0.95rem; margin: 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.55rem; align-items: center; }
+    button {
+      border: 1px solid var(--border);
+      background: #10131d;
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0.45rem 0.65rem;
+    }
+    button.primary { background: var(--accent); color: #111; border-color: transparent; font-weight: 700; }
+    .status { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .muted { color: var(--muted); font-size: 0.82rem; margin: 0.35rem 0 0; }
+
+    .inspector {
+      position: fixed;
+      right: 12px;
+      top: 12px;
+      z-index: 55;
+      width: min(92vw, 360px);
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 35, 0.97);
+      border-radius: 12px;
+      padding: 0.7rem;
+    }
+
+    .label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0c0f17;
+      color: var(--text);
+      padding: 0.5rem 0.55rem;
+    }
+
+    textarea { min-height: 68px; resize: vertical; }
+    input[type='range'] { accent-color: var(--accent); }
+
+    .hint {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      z-index: 40;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 35, 0.93);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      max-width: min(92vw, 520px);
+    }
   </style>
 </head>
 <body>
-  <div id="gate" class="gate">
-    <h1>Private editor</h1>
-    <p class="muted">Unlock your CMS panel for live editing, previewing, and publishing.</p>
+  <section id="gate" class="gate">
+    <h1>Private CMS editor</h1>
+    <p class="muted">This page is private. Unlock to edit content directly on the live preview.</p>
     <label class="label" for="key">Editor key</label>
     <input id="key" type="password" />
-    <div class="actions"><button id="unlock" class="primary">Unlock</button></div>
-  </div>
+    <div class="row"><button id="unlockBtn" class="primary">Unlock editor</button></div>
+  </section>
 
-  <main id="app" class="shell hidden">
-    <section id="cmsPanel" class="panel">
-      <div class="toolbar">
-        <h1>Portfolio CMS</h1>
-        <button id="togglePanelBtn">Wider preview</button>
-      </div>
-      <p class="muted">Live preview updates while typing. Save persists state. Apply/Download publishes to real file.</p>
+  <main id="app" class="editor-shell hidden">
+    <iframe id="preview" src="index.html"></iframe>
 
-      <div class="actions">
-        <button id="saveBtn" class="primary">Save edits</button>
-        <button id="applyFileBtn">Apply to index.html file</button>
-        <button id="downloadIndexBtn">Download updated index.html</button>
-        <button id="resetBtn">Reset defaults</button>
-        <button id="openSiteBtn">Open site</button>
-        <button id="inlineToggleBtn">Inline edit preview text</button>
+    <section class="dock">
+      <h1>Live CMS (Direct edit mode)</h1>
+      <p class="muted">Click highlighted text in preview to edit instantly. Click any work card to edit all fields.</p>
+      <div class="row">
+        <button id="saveBtn" class="primary">Save state</button>
+        <button id="applyBtn">Apply to index.html</button>
+        <button id="downloadBtn">Download index.html</button>
         <button id="addProjectBtn">Add project</button>
-        <span id="saveStatus" class="muted" style="align-self:center;">Ready</span>
+        <button id="resetBtn">Reset</button>
+        <span id="status" class="status">Ready</span>
       </div>
-
-      <div class="section">
-        <h2>Site text</h2>
-        <div id="siteFields"></div>
-      </div>
-
-      <div class="section">
-        <h2>Work items (drag to reorder)</h2>
-        <div id="projectFields"></div>
-      </div>
-
-      <pre id="output"></pre>
     </section>
 
-    <section class="preview">
-      <iframe id="preview" src="index.html"></iframe>
-    </section>
+    <aside id="inspector" class="inspector hidden">
+      <h2 id="inspectorTitle" style="margin:0;font-size:.9rem;">Inspector</h2>
+
+      <div id="siteInspector" class="hidden">
+        <label class="label">Text</label>
+        <textarea id="siteText"></textarea>
+        <label class="label">Font size (<span id="siteSizeLabel">1rem</span>)</label>
+        <input id="siteSize" type="range" min="0.55" max="8" step="0.05" />
+      </div>
+
+      <div id="projectInspector" class="hidden">
+        <label class="label">Title</label><input id="pTitle" />
+        <label class="label">Category</label><input id="pCategory" />
+        <label class="label">Role</label><input id="pRole" />
+        <label class="label">Year</label><input id="pYear" />
+        <label class="label">Studio</label><input id="pStudio" />
+        <label class="label">Deliverables</label><input id="pDeliverables" />
+        <label class="label">Description</label><textarea id="pDescription"></textarea>
+        <label class="label">Thumbnail image path</label><input id="pFile" placeholder="assets/thumbs/example.png" />
+        <label class="label">Vimeo id/url (comma separated)</label><input id="pVimeo" />
+        <label class="label">Style frame image paths (comma separated)</label><textarea id="pFrames"></textarea>
+        <label class="label">Order</label><input id="pOrder" type="number" />
+        <div class="row">
+          <button id="moveUpBtn" type="button">Move up</button>
+          <button id="moveDownBtn" type="button">Move down</button>
+          <button id="deleteBtn" type="button">Delete</button>
+          <button id="restoreBtn" type="button" class="hidden">Restore</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="hint">Tip: yellow outline = editable text. cyan outline = editable project card.</div>
   </main>
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
+    const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
+    const SITE_EDIT_IDS = [
+      'brandName','heroKicker','heroTitle','heroDescription','heroCta','heroStat1Value','heroStat1Label',
+      'heroStat2Value','heroStat2Label','heroStat3Value','heroStat3Label','workHeading','workSubheading',
+      'framesHeader','footerEmail','copyrightText'
+    ];
 
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
-    const keyInput = document.getElementById('key');
     const preview = document.getElementById('preview');
-    const saveStatus = document.getElementById('saveStatus');
-    const projectFields = document.getElementById('projectFields');
-    const editorChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('mrm_editor_channel') : null;
+    const keyInput = document.getElementById('key');
+    const statusEl = document.getElementById('status');
+    const inspector = document.getElementById('inspector');
+    const siteInspector = document.getElementById('siteInspector');
+    const projectInspector = document.getElementById('projectInspector');
+    const inspectorTitle = document.getElementById('inspectorTitle');
+    const editorChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
 
-    let inlineEditEnabled = false;
-    let dragSourceKey = null;
+    let state = { siteContent: {}, projectOverrides: {} };
+    let selectedSiteId = null;
+    let selectedProjectKey = null;
 
-    preview.src = INDEX_URL;
-
-    let state = { siteContent: {}, projectContent: {} };
-
-    function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
-
-    function defaultStateFromSnapshot(snapshot) {
-      return {
-        siteContent: snapshot.siteContent || {},
-        projectContent: snapshot.projectContent || {}
-      };
+    function safeParse(raw, fallback) {
+      try { return JSON.parse(raw); } catch { return fallback; }
     }
 
-    function parseVimeo(value) {
-      if (typeof value !== 'string') return value;
-      const parts = value.split(',').map(v => v.trim()).filter(Boolean);
-      const ids = parts.map((part) => {
-        const m = part.match(/(?:vimeo\.com\/(?:video\/)?)(\d+)/i);
-        return m ? m[1] : part;
-      });
-      return ids.length > 1 ? ids.join(', ') : (ids[0] || '');
-    }
+    function clone(v) { return JSON.parse(JSON.stringify(v)); }
 
-    function normalizeProject(project, fallbackOrder = 0) {
+    function normalizeProject(project = {}, fallbackOrder = 0) {
       return {
         title: project.title || 'Untitled Project',
         category: project.category || '',
@@ -141,238 +211,221 @@
         deliverables: project.deliverables || '',
         description: project.description || '',
         file: project.file || '',
-        vimeo: typeof project.vimeo === 'string' ? project.vimeo : Array.isArray(project.vimeo) ? project.vimeo.join(', ') : '',
-        frames: typeof project.frames === 'string' ? project.frames : Array.isArray(project.frames) ? project.frames.join(', ') : '',
+        vimeo: Array.isArray(project.vimeo) ? project.vimeo.join(', ') : (project.vimeo || ''),
+        frames: Array.isArray(project.frames) ? project.frames.join(', ') : (project.frames || ''),
         order: Number.isFinite(Number(project.order)) ? Number(project.order) : fallbackOrder,
         deleted: !!project.deleted
       };
     }
 
-    function loadSavedState() {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(EDITOR_STATE_KEY) || '{}');
-        if (parsed.siteContent && parsed.projectOverrides) {
-          state.siteContent = parsed.siteContent;
-          state.projectContent = Object.fromEntries(
-            Object.entries(parsed.projectOverrides).map(([k, v], i) => [k, normalizeProject(v, i)])
-          );
-        }
-      } catch {}
+    function loadLocalState() {
+      const parsed = safeParse(localStorage.getItem(EDITOR_STATE_KEY) || '{}', {});
+      if (!parsed || typeof parsed !== 'object') return;
+      if (parsed.siteContent && typeof parsed.siteContent === 'object') state.siteContent = clone(parsed.siteContent);
+      if (parsed.projectOverrides && typeof parsed.projectOverrides === 'object') {
+        state.projectOverrides = Object.fromEntries(
+          Object.entries(parsed.projectOverrides).map(([k, v], i) => [k, normalizeProject(v, i)])
+        );
+      }
     }
 
-    function saveState(status = 'Saved') {
-      localStorage.setItem(EDITOR_STATE_KEY, JSON.stringify({
-        siteContent: state.siteContent,
-        projectOverrides: state.projectContent
-      }));
-      if (saveStatus) saveStatus.textContent = status;
+    function setStatus(text, cls = '') {
+      statusEl.textContent = text;
+      statusEl.className = `status ${cls}`.trim();
+    }
+
+    function persistState(text = 'Saved') {
+      localStorage.setItem(EDITOR_STATE_KEY, JSON.stringify(state));
+      setStatus(text, text.includes('Saved') ? 'ok' : '');
     }
 
     function broadcastState() {
       if (!editorChannel) return;
-      editorChannel.postMessage({
-        type: 'editor-state-update',
-        payload: { siteContent: state.siteContent, projectOverrides: state.projectContent }
-      });
+      editorChannel.postMessage({ type: 'editor-state-update', payload: clone(state) });
     }
 
-    function postPreviewUpdate() {
+    function postPreviewState() {
       try {
         preview.contentWindow.postMessage({
           type: 'portfolio-preview-update',
-          payload: { siteContent: state.siteContent, projectOverrides: state.projectContent }
+          payload: clone(state)
         }, '*');
       } catch {}
     }
 
-    function renderOutput() {
-      document.getElementById('output').textContent =
-`let siteContent = ${JSON.stringify(state.siteContent, null, 2)};\n\nlet projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
-    }
-
-    function pushAll(status='Saved') {
-      saveState(status);
-      renderOutput();
-      postPreviewUpdate();
+    function syncAll(status = 'Saved') {
+      persistState(status);
+      postPreviewState();
       broadcastState();
+      setTimeout(enableDirectEditing, 80);
     }
 
-    function makeSiteField(id, value) {
-      const box = document.createElement('div');
-      box.className = 'field';
-      box.innerHTML = `<label class="label">${id}</label>`;
-
-      const input = document.createElement('textarea');
-      input.value = value.text || '';
-      input.addEventListener('input', () => {
-        state.siteContent[id].text = input.value;
-        pushAll('Saving…');
-      });
-
-      const row = document.createElement('div');
-      row.className = 'size';
-      const range = document.createElement('input');
-      range.type = 'range';
-      range.min = '0.55';
-      range.max = '8';
-      range.step = '0.05';
-      range.value = String(value.size || 1);
-      const pill = document.createElement('span');
-      pill.className = 'pill';
-      pill.textContent = `${range.value}rem`;
-      range.addEventListener('input', () => {
-        state.siteContent[id].size = Number(range.value);
-        pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
-        pushAll('Saving…');
-      });
-      row.append(range, pill);
-      box.append(input, row);
-      return box;
+    function extractSnapshot() {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return false;
+      const snap = snapshotFn();
+      if (!snap || !snap.siteContent) return false;
+      state.siteContent = clone(snap.siteContent);
+      state.projectOverrides = Object.fromEntries(
+        Object.entries(snap.projectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
+      );
+      return true;
     }
 
-    function sortedProjectEntries() {
-      return Object.entries(state.projectContent)
-        .sort((a, b) => Number(a[1].order || 0) - Number(b[1].order || 0));
-    }
-
-    function updateProjectOrder(keys) {
-      keys.forEach((key, idx) => {
-        if (!state.projectContent[key]) return;
-        state.projectContent[key].order = idx;
-      });
-      pushAll('Saved');
-      renderProjectFields();
+    function sortedProjectKeys() {
+      return Object.entries(state.projectOverrides)
+        .sort((a, b) => Number(a[1].order || 0) - Number(b[1].order || 0))
+        .map(([k]) => k);
     }
 
     function moveProject(key, dir) {
-      const keys = sortedProjectEntries().map(([k]) => k);
+      const keys = sortedProjectKeys();
       const i = keys.indexOf(key);
-      const j = i + dir;
-      if (i < 0 || j < 0 || j >= keys.length) return;
-      [keys[i], keys[j]] = [keys[j], keys[i]];
-      updateProjectOrder(keys);
+      const next = i + dir;
+      if (i < 0 || next < 0 || next >= keys.length) return;
+      [keys[i], keys[next]] = [keys[next], keys[i]];
+      keys.forEach((k, idx) => {
+        if (state.projectOverrides[k]) state.projectOverrides[k].order = idx;
+      });
+      syncAll('Saved');
+      openProjectInspector(key);
     }
 
-    function makeField(labelText, value, onInput, type='text') {
-      const label = document.createElement('label');
-      label.className = 'label';
-      label.textContent = labelText;
-      const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
-      if (type !== 'textarea') input.type = type;
-      input.value = value ?? '';
-      input.addEventListener('input', () => onInput(input.value));
-      return [label, input];
+    function openInspector() {
+      inspector.classList.remove('hidden');
+      siteInspector.classList.add('hidden');
+      projectInspector.classList.add('hidden');
     }
 
-    function makeProjectCard(projectKey, project) {
-      const card = document.createElement('div');
-      card.className = 'project-card-editor';
-      card.draggable = true;
-      card.dataset.key = projectKey;
+    function openSiteInspector(id) {
+      const value = state.siteContent[id];
+      if (!value) return;
+      selectedSiteId = id;
+      selectedProjectKey = null;
+      openInspector();
+      siteInspector.classList.remove('hidden');
+      inspectorTitle.textContent = `Editing text: ${id}`;
+      document.getElementById('siteText').value = value.text || '';
+      const size = Number(value.size || 1);
+      const range = document.getElementById('siteSize');
+      range.value = String(size);
+      document.getElementById('siteSizeLabel').textContent = `${size}rem`;
+    }
 
-      card.addEventListener('dragstart', () => { dragSourceKey = projectKey; card.style.opacity = '0.5'; });
-      card.addEventListener('dragend', () => { card.style.opacity = '1'; });
-      card.addEventListener('dragover', (e) => e.preventDefault());
-      card.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (!dragSourceKey || dragSourceKey === projectKey) return;
-        const keys = sortedProjectEntries().map(([k]) => k);
-        const from = keys.indexOf(dragSourceKey);
-        const to = keys.indexOf(projectKey);
-        keys.splice(to, 0, keys.splice(from, 1)[0]);
-        updateProjectOrder(keys);
+    function openProjectInspector(projectKey) {
+      const value = state.projectOverrides[projectKey];
+      if (!value) return;
+      selectedProjectKey = projectKey;
+      selectedSiteId = null;
+      openInspector();
+      projectInspector.classList.remove('hidden');
+      inspectorTitle.textContent = `Editing work item: ${projectKey}`;
+      document.getElementById('pTitle').value = value.title || '';
+      document.getElementById('pCategory').value = value.category || '';
+      document.getElementById('pRole').value = value.role || '';
+      document.getElementById('pYear').value = value.year || '';
+      document.getElementById('pStudio').value = value.studio || '';
+      document.getElementById('pDeliverables').value = value.deliverables || '';
+      document.getElementById('pDescription').value = value.description || '';
+      document.getElementById('pFile').value = value.file || '';
+      document.getElementById('pVimeo').value = value.vimeo || '';
+      document.getElementById('pFrames').value = value.frames || '';
+      document.getElementById('pOrder').value = String(Number(value.order || 0));
+      document.getElementById('deleteBtn').classList.toggle('hidden', value.deleted);
+      document.getElementById('restoreBtn').classList.toggle('hidden', !value.deleted);
+    }
+
+    function wireInspectorInputs() {
+      document.getElementById('siteText').addEventListener('input', (e) => {
+        if (!selectedSiteId || !state.siteContent[selectedSiteId]) return;
+        state.siteContent[selectedSiteId].text = e.target.value;
+        syncAll('Saving…');
+      });
+      document.getElementById('siteSize').addEventListener('input', (e) => {
+        if (!selectedSiteId || !state.siteContent[selectedSiteId]) return;
+        const size = Number(e.target.value);
+        state.siteContent[selectedSiteId].size = size;
+        document.getElementById('siteSizeLabel').textContent = `${size}rem`;
+        syncAll('Saving…');
       });
 
-      const header = document.createElement('div');
-      header.className = 'project-header';
-      header.innerHTML = `<div class="project-title">${project.title}</div><div class="drag-handle">⠿ drag</div>`;
-
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-      const up = document.createElement('button'); up.textContent = 'Move up'; up.type='button'; up.onclick = () => moveProject(projectKey, -1);
-      const down = document.createElement('button'); down.textContent = 'Move down'; down.type='button'; down.onclick = () => moveProject(projectKey, 1);
-      const del = document.createElement('button'); del.textContent = project.deleted ? 'Restore' : 'Delete'; del.type='button';
-      del.onclick = () => { state.projectContent[projectKey].deleted = !state.projectContent[projectKey].deleted; pushAll('Saved'); renderProjectFields(); };
-      actions.append(up, down, del);
-
-      const body = document.createElement('div');
-      body.className = 'project-row';
-
-      const fields = [
-        ['title', 'text'], ['category', 'text'], ['role', 'text'], ['year', 'text'], ['studio', 'text'],
-        ['deliverables', 'text'], ['description', 'textarea'], ['file', 'text'], ['vimeo', 'text'], ['frames', 'text'], ['order', 'number']
-      ];
-
-      fields.forEach(([key, type]) => {
-        const [label, input] = makeField(key, project[key], (val) => {
-          state.projectContent[projectKey][key] = key === 'order' ? Number(val || 0) : (key === 'vimeo' ? parseVimeo(val) : val);
-          pushAll('Saving…');
-          if (key === 'order') renderProjectFields();
-        }, type);
-        body.append(label, input);
-      });
-
-      card.append(header, actions, body);
-      if (project.deleted) card.style.opacity = '0.5';
-      return card;
-    }
-
-    function renderProjectFields() {
-      projectFields.innerHTML = '';
-      sortedProjectEntries().forEach(([key, value]) => {
-        projectFields.appendChild(makeProjectCard(key, value));
-      });
-    }
-
-    function renderForms() {
-      const siteRoot = document.getElementById('siteFields');
-      siteRoot.innerHTML = '';
-      Object.entries(state.siteContent).forEach(([id, value]) => siteRoot.appendChild(makeSiteField(id, value)));
-      renderProjectFields();
-      pushAll('Saved');
-    }
-
-    function setInlineEditable(doc, id, enabled) {
-      const el = doc.getElementById(id);
-      if (!el) return;
-      el.contentEditable = enabled ? 'true' : 'false';
-      el.style.outline = enabled ? '1px dashed #8ea0ff' : '';
-      if (!enabled) return;
-      el.oninput = () => {
-        if (!state.siteContent[id]) return;
-        state.siteContent[id].text = el.innerHTML;
-        pushAll('Saving…');
+      const mapping = {
+        pTitle: 'title', pCategory: 'category', pRole: 'role', pYear: 'year', pStudio: 'studio',
+        pDeliverables: 'deliverables', pDescription: 'description', pFile: 'file', pVimeo: 'vimeo',
+        pFrames: 'frames', pOrder: 'order'
       };
-    }
+      Object.entries(mapping).forEach(([id, key]) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+          state.projectOverrides[selectedProjectKey][key] = key === 'order' ? Number(e.target.value || 0) : e.target.value;
+          syncAll('Saving…');
+        });
+      });
 
-    function setInlineProjectEditable(doc, enabled) {
-      const titles = doc.querySelectorAll('.project-card .card-title');
-      titles.forEach((node) => {
-        const key = node.closest('.project-card')?.dataset?.projectKey;
-        if (!key || !state.projectContent[key]) return;
-        node.contentEditable = enabled ? 'true' : 'false';
-        node.style.outline = enabled ? '1px dashed #8ea0ff' : '';
-        if (!enabled) return;
-        node.oninput = () => {
-          state.projectContent[key].title = node.innerText;
-          pushAll('Saving…');
-          renderProjectFields();
-        };
+      document.getElementById('moveUpBtn').addEventListener('click', () => {
+        if (selectedProjectKey) moveProject(selectedProjectKey, -1);
+      });
+      document.getElementById('moveDownBtn').addEventListener('click', () => {
+        if (selectedProjectKey) moveProject(selectedProjectKey, 1);
+      });
+      document.getElementById('deleteBtn').addEventListener('click', () => {
+        if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+        state.projectOverrides[selectedProjectKey].deleted = true;
+        syncAll('Saved');
+        openProjectInspector(selectedProjectKey);
+      });
+      document.getElementById('restoreBtn').addEventListener('click', () => {
+        if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+        state.projectOverrides[selectedProjectKey].deleted = false;
+        syncAll('Saved');
+        openProjectInspector(selectedProjectKey);
       });
     }
 
-    function toggleInlineEdit() {
+    function enableDirectEditing() {
       const doc = preview.contentDocument;
-      if (!doc) { alert('Preview not ready yet.'); return; }
-      inlineEditEnabled = !inlineEditEnabled;
-      Object.keys(state.siteContent).forEach((id) => setInlineEditable(doc, id, inlineEditEnabled));
-      setInlineProjectEditable(doc, inlineEditEnabled);
-      document.getElementById('inlineToggleBtn').textContent = inlineEditEnabled ? 'Disable inline edit' : 'Inline edit preview text';
+      if (!doc) return;
+
+      SITE_EDIT_IDS.forEach((id) => {
+        const el = doc.getElementById(id);
+        if (!el || !state.siteContent[id]) return;
+        el.contentEditable = 'true';
+        el.style.outline = '1px dashed rgba(255, 214, 107, 0.7)';
+        el.style.outlineOffset = '2px';
+        el.addEventListener('focus', () => openSiteInspector(id));
+        el.addEventListener('click', () => openSiteInspector(id));
+        el.addEventListener('input', () => {
+          state.siteContent[id].text = el.innerHTML;
+          syncAll('Saving…');
+        });
+      });
+
+      doc.querySelectorAll('.project-card').forEach((card) => {
+        const key = card.dataset.projectKey;
+        if (!key) return;
+        card.style.outline = '1px solid rgba(93, 245, 255, 0.55)';
+        card.style.outlineOffset = '-1px';
+        card.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openProjectInspector(key);
+        }, true);
+
+        const title = card.querySelector('.card-title');
+        if (title && state.projectOverrides[key]) {
+          title.contentEditable = 'true';
+          title.addEventListener('focus', () => openProjectInspector(key));
+          title.addEventListener('input', () => {
+            state.projectOverrides[key].title = title.innerText.trim();
+            syncAll('Saving…');
+          });
+        }
+      });
     }
 
     function buildUpdatedIndexHtml(sourceHtml) {
       const nextSite = `let siteContent = ${JSON.stringify(state.siteContent, null, 2)};`;
-      const nextProjects = `let projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
+      const nextProjects = `let projectContentOverrides = ${JSON.stringify(state.projectOverrides, null, 2)};`;
       let updated = sourceHtml.replace(/let\s+siteContent\s*=\s*\{[\s\S]*?\};/, nextSite);
       updated = updated.replace(/let\s+projectContentOverrides\s*=\s*\{[\s\S]*?\};/, nextProjects);
       return updated;
@@ -381,7 +434,7 @@
     async function fetchCurrentIndexHtml() {
       const res = await fetch(INDEX_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('Could not load index.html');
-      return await res.text();
+      return res.text();
     }
 
     function downloadTextFile(filename, text) {
@@ -394,91 +447,88 @@
       URL.revokeObjectURL(url);
     }
 
-    async function hydrateFromPreview() {
-      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
-      if (typeof snapshotFn !== 'function') return;
-      const snap = snapshotFn();
-      state = defaultStateFromSnapshot(snap);
-      state.projectContent = Object.fromEntries(Object.entries(state.projectContent).map(([k, v], i) => [k, normalizeProject(v, i)]));
-      renderForms();
-    }
-
     function unlockEditor() {
-      if (keyInput.value !== EDITOR_KEY) { alert('Incorrect key.'); return; }
+      if (keyInput.value !== EDITOR_KEY) {
+        alert('Incorrect key.');
+        return;
+      }
       sessionStorage.setItem('editorUnlocked', '1');
-      loadSavedState();
       gate.classList.add('hidden');
       app.classList.remove('hidden');
-      renderForms();
+      setStatus('Loading preview…', 'warn');
     }
 
-    document.getElementById('unlock').addEventListener('click', unlockEditor);
-
-    preview.addEventListener('load', async () => {
-      await hydrateFromPreview();
-      postPreviewUpdate();
-    });
+    document.getElementById('unlockBtn').addEventListener('click', unlockEditor);
 
     if (sessionStorage.getItem('editorUnlocked') === '1') {
-      loadSavedState();
       gate.classList.add('hidden');
       app.classList.remove('hidden');
-      renderForms();
+      setStatus('Loading preview…', 'warn');
     }
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      pushAll('Saved');
-      alert('Saved locally and pushed live to preview/open tabs.');
+    preview.src = INDEX_URL;
+    preview.addEventListener('load', () => {
+      const hydrated = extractSnapshot();
+      if (!hydrated) loadLocalState();
+      syncAll('Saved');
+      enableDirectEditing();
+      setStatus(hydrated ? 'Preview connected' : 'Loaded local state', hydrated ? 'ok' : 'warn');
     });
 
-    document.getElementById('applyFileBtn').addEventListener('click', async () => {
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      syncAll('Saved');
+      alert('Saved. Edits are live in preview and stored in your browser.');
+    });
+
+    document.getElementById('addProjectBtn').addEventListener('click', () => {
+      const key = `custom:${Date.now()}`;
+      state.projectOverrides[key] = normalizeProject({ title: 'New Project', order: sortedProjectKeys().length }, sortedProjectKeys().length);
+      syncAll('Saved');
+      openProjectInspector(key);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset all editor changes back to default?')) return;
+      localStorage.removeItem(EDITOR_STATE_KEY);
+      location.reload();
+    });
+
+    document.getElementById('applyBtn').addEventListener('click', async () => {
       if (!window.showOpenFilePicker) {
-        alert('Direct file apply is not supported in this browser. Use Download updated index.html instead.');
+        alert('Direct Apply is not supported here. Use Download index.html.');
         return;
       }
       try {
-        const [fileHandle] = await window.showOpenFilePicker({
-          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }], multiple: false
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }],
+          multiple: false
         });
-        const file = await fileHandle.getFile();
+        const file = await handle.getFile();
         const updated = buildUpdatedIndexHtml(await file.text());
-        const writable = await fileHandle.createWritable();
-        await writable.write(updated); await writable.close();
-        saveStatus.textContent = 'Applied to file';
+        const writable = await handle.createWritable();
+        await writable.write(updated);
+        await writable.close();
+        setStatus('Applied to file', 'ok');
       } catch (error) {
-        if (error?.name !== 'AbortError') alert(`Apply failed: ${error.message}`);
+        if (error?.name !== 'AbortError') {
+          setStatus('Apply failed', 'warn');
+          alert(`Apply failed: ${error.message}`);
+        }
       }
     });
 
-    document.getElementById('downloadIndexBtn').addEventListener('click', async () => {
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
       try {
         const updated = buildUpdatedIndexHtml(await fetchCurrentIndexHtml());
         downloadTextFile('index.html', updated);
-        saveStatus.textContent = 'Downloaded index.html';
+        setStatus('Downloaded index.html', 'ok');
       } catch (error) {
+        setStatus('Download failed', 'warn');
         alert(`Download failed: ${error.message}`);
       }
     });
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      localStorage.removeItem(EDITOR_STATE_KEY);
-      preview.contentWindow?.localStorage?.removeItem(EDITOR_STATE_KEY);
-      window.location.reload();
-    });
-
-    document.getElementById('openSiteBtn').addEventListener('click', () => window.open(INDEX_URL, '_blank'));
-    document.getElementById('inlineToggleBtn').addEventListener('click', toggleInlineEdit);
-    document.getElementById('addProjectBtn').addEventListener('click', () => {
-      const key = `custom:${Date.now()}`;
-      state.projectContent[key] = normalizeProject({ title: 'New Project', file: '', vimeo: '', frames: '', order: Object.keys(state.projectContent).length }, Object.keys(state.projectContent).length);
-      renderForms();
-    });
-
-    document.getElementById('togglePanelBtn').addEventListener('click', () => {
-      app.classList.toggle('collapsed');
-      const collapsed = app.classList.contains('collapsed');
-      document.getElementById('togglePanelBtn').textContent = collapsed ? 'Wider panel' : 'Wider preview';
-    });
+    wireInspectorInputs();
   </script>
 </body>
 </html>
