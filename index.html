@@ -674,11 +674,28 @@
 
         applySiteContent(siteContent);
 
+        function normalizeVimeo(value) {
+            if (Array.isArray(value)) return value;
+            if (typeof value !== 'string') return [];
+            const clean = value.split(',').map(item => item.trim()).filter(Boolean);
+            return clean.length <= 1 ? (clean[0] || '') : clean;
+        }
+
+        function normalizeFrames(value) {
+            if (Array.isArray(value)) return value;
+            if (typeof value !== 'string') return [];
+            return value.split(',').map(item => item.trim()).filter(Boolean);
+        }
+
         function applyProjectOverrides(sourceProjects, overrides = {}) {
-            return sourceProjects.map((project) => {
-                const override = overrides[project.file];
-                if (!override) return { ...project };
-                return {
+            const baseKeys = new Set(sourceProjects.map(project => project.file));
+
+            const enriched = sourceProjects.flatMap((project, index) => {
+                const override = overrides[project.file] || {};
+                if (override.deleted) return [];
+
+                const parsedOrder = Number(override.order);
+                return [{
                     ...project,
                     title: override.title ?? project.title,
                     category: override.category ?? project.category,
@@ -686,21 +703,53 @@
                     year: override.year ?? project.year,
                     studio: override.studio ?? project.studio,
                     deliverables: override.deliverables ?? project.deliverables,
-                    description: override.description ?? project.description
-                };
+                    description: override.description ?? project.description,
+                    file: override.file ?? project.file,
+                    vimeo: override.vimeo !== undefined ? normalizeVimeo(override.vimeo) : project.vimeo,
+                    frames: override.frames !== undefined ? normalizeFrames(override.frames) : project.frames,
+                    order: Number.isFinite(parsedOrder) ? parsedOrder : index,
+                    sourceKey: project.file
+                }];
             });
+
+            const customProjects = Object.entries(overrides)
+                .filter(([key, value]) => !baseKeys.has(key) && !value.deleted)
+                .map(([key, value], index) => {
+                    const parsedOrder = Number(value.order);
+                    return {
+                        title: value.title || 'Untitled Project',
+                        file: value.file || '',
+                        vimeo: value.vimeo !== undefined ? normalizeVimeo(value.vimeo) : '',
+                        category: value.category || 'Category',
+                        role: value.role || 'Role',
+                        year: value.year || '',
+                        studio: value.studio || '',
+                        deliverables: value.deliverables || '',
+                        description: value.description || '',
+                        frames: value.frames !== undefined ? normalizeFrames(value.frames) : [],
+                        order: Number.isFinite(parsedOrder) ? parsedOrder : sourceProjects.length + index,
+                        sourceKey: key
+                    };
+                });
+
+            return [...enriched, ...customProjects].sort((a, b) => a.order - b.order);
         }
 
         function getProjectContentSnapshot(currentProjects) {
-            return currentProjects.reduce((acc, project) => {
-                acc[project.file] = {
+            return currentProjects.reduce((acc, project, index) => {
+                acc[project.sourceKey || project.file] = {
                     title: project.title,
                     category: project.category,
                     role: project.role,
                     year: project.year,
                     studio: project.studio,
                     deliverables: project.deliverables,
-                    description: project.description
+                    description: project.description,
+                    file: project.file,
+                    vimeo: Array.isArray(project.vimeo) ? project.vimeo.join(', ') : project.vimeo,
+                    frames: Array.isArray(project.frames) ? project.frames.join(', ') : '',
+                    order: Number.isFinite(Number(project.order)) ? Number(project.order) : index,
+                    deleted: false
                 };
                 return acc;
             }, {});
@@ -910,11 +959,14 @@
             projects.forEach((proj) => {
                 const card = document.createElement('div');
                 card.className = 'project-card';
+                card.dataset.projectKey = proj.sourceKey || proj.file;
 
-                const imagePath = proj.file.includes('/') ? proj.file : `assets/thumbs/${proj.file}`;
+                const imagePath = proj.file
+                    ? (proj.file.includes('/') ? proj.file : `assets/thumbs/${proj.file}`)
+                    : '';
 
                 card.innerHTML = `
-                    <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
+                    ${imagePath ? `<img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:#111;"></div>`}
                     <div class="card-overlay">
                         <div class="card-title">${proj.title}</div>
                         <div class="card-action">View Project</div>

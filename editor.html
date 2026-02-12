@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor5</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -157,6 +157,7 @@
       </div>
       <div class="floating-body">
         <p class="muted">Edit highlighted text in preview. Click a work card to edit video/media data instead of opening it.</p>
+        <p id="editorVersion" class="muted" style="margin-top:0.25rem;"></p>
         <div class="row">
           <button id="saveBtn" class="primary">Save state</button>
           <button id="applyBtn">Apply to index.html</button>
@@ -217,6 +218,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
+    const CMS_EDITOR_VERSION = 'v2.2.0';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -304,6 +306,12 @@
     function setStatus(text, cls = '') {
       statusEl.textContent = text;
       statusEl.className = `status ${cls}`.trim();
+    }
+
+    function setVersionUI() {
+      const versionEl = document.getElementById('editorVersion');
+      if (!versionEl) return;
+      versionEl.textContent = `Editor version: ${CMS_EDITOR_VERSION}`;
     }
 
     function persistState(text = 'Saved') {
@@ -454,8 +462,11 @@
       let style = doc.getElementById('cmsCardEditModeStyle');
       if (!projectEditMode) {
         if (style) style.remove();
+        doc.documentElement.removeAttribute('data-cms-card-edit');
         return;
       }
+
+      doc.documentElement.setAttribute('data-cms-card-edit', 'on');
 
       if (!style) {
         style = doc.createElement('style');
@@ -464,20 +475,32 @@
       }
 
       style.textContent = `
-        .project-card img,
-        .project-card .card-overlay,
-        .project-card .card-title,
-        .project-card .card-action,
-        .project-card .card-meta {
+        [data-cms-card-edit='on'] .project-card {
+          outline: 2px solid rgba(93, 245, 255, 0.82) !important;
+          outline-offset: -2px !important;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+          cursor: pointer !important;
+        }
+        [data-cms-card-edit='on'] .project-card > * {
           pointer-events: none !important;
+        }
+        [data-cms-card-edit='on'] .project-card .cms-card-edit-badge {
+          pointer-events: auto !important;
+          display: inline-flex !important;
+        }
+        [data-cms-card-edit='on'] .project-card img,
+        [data-cms-card-edit='on'] .project-card .card-overlay,
+        [data-cms-card-edit='on'] .project-card .card-title,
+        [data-cms-card-edit='on'] .project-card .card-action,
+        [data-cms-card-edit='on'] .project-card .card-meta {
           transition: none !important;
           transform: none !important;
         }
-        .project-card:hover img {
+        [data-cms-card-edit='on'] .project-card:hover img {
           transform: none !important;
           opacity: 1 !important;
         }
-        .project-card:hover .card-overlay {
+        [data-cms-card-edit='on'] .project-card:hover .card-overlay {
           opacity: 1 !important;
         }
       `;
@@ -522,10 +545,6 @@
       doc.querySelectorAll('.project-card').forEach((card) => {
         const key = card.dataset.projectKey;
         if (!key) return;
-        card.style.outline = '2px solid rgba(93, 245, 255, 0.7)';
-        card.style.outlineOffset = '-2px';
-        card.style.boxShadow = 'inset 0 0 0 1px rgba(0, 0, 0, 0.45)';
-        card.style.cursor = projectEditMode ? 'pointer' : '';
 
         if (!card.querySelector('.cms-card-edit-badge')) {
           const badge = doc.createElement('button');
@@ -757,6 +776,7 @@
       }
     });
 
+    setVersionUI();
     setupPanelControls();
     wireInspectorInputs();
   </script>
