@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor</title>
+  <title>Private CMS Editor3</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -355,6 +355,36 @@
       return true;
     }
 
+    function hydrateProjectFromPreview(projectKey) {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return false;
+      const snap = snapshotFn();
+      const projectMap = snap?.projectContent || {};
+      if (projectMap[projectKey]) {
+        const fallbackOrder = sortedProjectKeys().length;
+        state.projectOverrides[projectKey] = normalizeProject(projectMap[projectKey], fallbackOrder);
+        return true;
+      }
+      return false;
+    }
+
+    function ensureProjectExists(projectKey) {
+      if (state.projectOverrides[projectKey]) return true;
+      if (hydrateProjectFromPreview(projectKey)) return true;
+
+      const doc = preview.contentDocument;
+      const card = doc?.querySelector(`.project-card[data-project-key="${CSS.escape(projectKey)}"]`);
+      if (!card) return false;
+
+      const title = card.querySelector('.card-title')?.innerText?.trim() || 'Untitled Project';
+      state.projectOverrides[projectKey] = normalizeProject({
+        title,
+        order: sortedProjectKeys().length
+      }, sortedProjectKeys().length);
+      syncAll('Saved');
+      return true;
+    }
+
     function sortedProjectKeys() {
       return Object.entries(state.projectOverrides)
         .sort((a, b) => Number(a[1].order || 0) - Number(b[1].order || 0))
@@ -398,6 +428,7 @@
     }
 
     function openProjectInspector(projectKey) {
+      if (!ensureProjectExists(projectKey)) return;
       const value = state.projectOverrides[projectKey];
       if (!value) return;
       selectedProjectKey = projectKey;
