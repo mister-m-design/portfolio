@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Private Site Editor</title>
-<style>
-  :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
-* { box-sizing: border-box; }
+  <title>Private Site Editor</title>
+  <style>
+    :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
+    * { box-sizing: border-box; }
     body { margin:0; font-family: Inter, system-ui, sans-serif; background:var(--bg); color:var(--text); }
     .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
     .hidden { display:none !important; }
@@ -31,47 +31,6 @@
     iframe { width:100%; height:100%; border:0; }
     pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.6rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
     @media (max-width: 1100px) { .shell { grid-template-columns:1fr; } .right { min-height:70vh; } .left { max-height:none; } }
-  <title>Site Content Editor | Private</title>
-  <style>
-    :root {
-      --bg: #0c0c0f;
-      --card: #16171b;
-      --muted: #8c92a4;
-      --text: #f3f5ff;
-      --border: #2a2d35;
-      --accent: #9fa6ff;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, system-ui, sans-serif;
-      min-height: 100vh;
-    }
-    .shell { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 3rem; }
-    .top { display:flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    h1 { margin: 0; font-size: 1.4rem; }
-    .muted { color: var(--muted); font-size: 0.9rem; }
-    .notice { background: #101219; border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1rem; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .field { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem; }
-    .label { display:block; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
-    input[type="text"], textarea {
-      width: 100%; background: #0f1014; color: var(--text); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.55rem 0.65rem; font-size: 0.9rem;
-    }
-    textarea { min-height: 80px; resize: vertical; }
-    .size { display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; align-items: center; margin-top: 0.55rem; }
-    input[type="range"] { width: 100%; accent-color: var(--accent); }
-    .pill { border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 0.2rem 0.5rem; font-size: 0.75rem; }
-    .actions { position: sticky; bottom: 0; margin-top: 1rem; padding-top: 1rem; display:flex; gap:0.6rem; flex-wrap: wrap; background: linear-gradient(180deg, rgba(12,12,15,0), rgba(12,12,15,1) 30%); }
-    button { background: #11131a; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 0.58rem 0.85rem; cursor: pointer; }
-    button.primary { background: var(--accent); color: #111; border-color: transparent; font-weight: 700; }
-    pre { margin-top: 1rem; white-space: pre-wrap; background: #0f1014; border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; max-height: 300px; overflow: auto; font-size: 0.8rem; }
-    .gate { max-width: 380px; margin: 14vh auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
-    .hidden { display: none; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -102,34 +61,6 @@
       <pre id="output"></pre>
     </section>
     <section class="right"><iframe id="preview" src="/"></iframe></section>
-    <h1>Private Editor Access</h1>
-    <p class="muted">This page is intentionally separate from the homepage. Enter your private key to unlock.</p>
-    <label class="label" for="pass">Editor key</label>
-    <input id="pass" type="password" />
-    <div class="actions">
-      <button class="primary" id="unlock">Unlock</button>
-    </div>
-  </div>
-
-  <main id="app" class="shell hidden">
-    <div class="top">
-      <h1>Portfolio Content Editor</h1>
-      <span class="muted">Use this page only for editing. It is not linked from the public homepage.</span>
-    </div>
-
-    <div class="notice muted">
-      After editing, click <strong>Copy Config</strong>, then paste the generated <code>siteContent</code> object into <code>index.html</code>.
-      This updates the live website for everyone once deployed.
-    </div>
-
-    <div id="fields" class="grid"></div>
-
-    <div class="actions">
-      <button class="primary" id="copyBtn">Copy Config</button>
-      <button id="resetBtn">Reset defaults</button>
-    </div>
-
-    <pre id="output"></pre>
   </main>
 
   <script>
@@ -264,111 +195,6 @@
       preview.src = '/';
       preview.addEventListener('load', hydrateFromPreview, { once: true });
     });
-    const pass = document.getElementById('pass');
-
-    document.getElementById('unlock').addEventListener('click', () => {
-      if (pass.value !== EDITOR_KEY) {
-        alert('Incorrect key.');
-        return;
-      }
-      sessionStorage.setItem('editorUnlocked', '1');
-      gate.classList.add('hidden');
-      app.classList.remove('hidden');
-    });
-
-    if (sessionStorage.getItem('editorUnlocked') === '1') {
-      gate.classList.add('hidden');
-      app.classList.remove('hidden');
-    }
-
-    const fields = [
-      { id: 'brandName', label: 'Header name', type: 'text', size: 1.1, min: 0.8, max: 2, step: 0.05, text: 'Michael Rush Murtha' },
-      { id: 'heroKicker', label: 'Hero kicker', type: 'text', size: 0.78, min: 0.6, max: 1.4, step: 0.02, text: 'Motion Graphics • Main Title Design • Visual Development' },
-      { id: 'heroTitle', label: 'Hero title', type: 'textarea', size: 5.3, min: 2.6, max: 8, step: 0.1, text: 'Title Design for<br>Film, TV, & Games' },
-      { id: 'heroDescription', label: 'Hero description', type: 'textarea', size: 1.2, min: 0.9, max: 2, step: 0.05, text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.' },
-      { id: 'heroCta', label: 'Hero button', type: 'text', size: 0.9, min: 0.7, max: 1.6, step: 0.05, text: '▶ Watch Reel' },
-      { id: 'heroStat1Value', label: 'Stat 1 value', type: 'text', size: 1.6, min: 1, max: 3, step: 0.05, text: '15+' },
-      { id: 'heroStat1Label', label: 'Stat 1 label', type: 'text', size: 0.7, min: 0.55, max: 1.2, step: 0.02, text: 'Years in design + VFX' },
-      { id: 'heroStat2Value', label: 'Stat 2 value', type: 'text', size: 1.6, min: 1, max: 3, step: 0.05, text: '20+' },
-      { id: 'heroStat2Label', label: 'Stat 2 label', type: 'text', size: 0.7, min: 0.55, max: 1.2, step: 0.02, text: 'Major film / TV / game credits' },
-      { id: 'heroStat3Value', label: 'Stat 3 value', type: 'text', size: 1.6, min: 1, max: 3, step: 0.05, text: 'End-to-End' },
-      { id: 'heroStat3Label', label: 'Stat 3 label', type: 'text', size: 0.7, min: 0.55, max: 1.2, step: 0.02, text: 'Concept, design, animation, comp' },
-      { id: 'workHeading', label: 'Work heading', type: 'text', size: 1, min: 0.8, max: 2.2, step: 0.05, text: 'Selected Works' },
-      { id: 'workSubheading', label: 'Work subheading', type: 'text', size: 1, min: 0.8, max: 2.2, step: 0.05, text: 'Project Context + Contributions' },
-      { id: 'framesHeader', label: 'Style frames heading', type: 'text', size: 1, min: 0.8, max: 2.2, step: 0.05, text: 'Style Frames' },
-      { id: 'footerEmail', label: 'Footer email', type: 'text', size: 1.2, min: 0.8, max: 2, step: 0.05, text: 'mmurtha@gmail.com' },
-      { id: 'copyrightText', label: 'Copyright', type: 'text', size: 0.8, min: 0.65, max: 1.4, step: 0.05, text: '&copy; 2024 Michael Rush Murtha' }
-    ];
-
-    const fieldsRoot = document.getElementById('fields');
-    const output = document.getElementById('output');
-
-    function updateOutput() {
-      const content = {};
-      fields.forEach((f) => {
-        content[f.id] = { text: f.text, size: Number(f.size) };
-      });
-      output.textContent = `const siteContent = ${JSON.stringify(content, null, 2)};`;
-    }
-
-    function render() {
-      fieldsRoot.innerHTML = '';
-      fields.forEach((f, idx) => {
-        const card = document.createElement('div');
-        card.className = 'field';
-
-        const label = document.createElement('label');
-        label.className = 'label';
-        label.textContent = f.label;
-
-        const input = document.createElement(f.type === 'textarea' ? 'textarea' : 'input');
-        if (f.type !== 'textarea') input.type = 'text';
-        input.value = f.text;
-
-        const size = document.createElement('div');
-        size.className = 'size';
-        const range = document.createElement('input');
-        range.type = 'range';
-        range.min = f.min;
-        range.max = f.max;
-        range.step = f.step;
-        range.value = f.size;
-
-        const pill = document.createElement('span');
-        pill.className = 'pill';
-        pill.textContent = `${f.size}rem`;
-
-        input.addEventListener('input', () => {
-          fields[idx].text = input.value;
-          updateOutput();
-        });
-
-        range.addEventListener('input', () => {
-          fields[idx].size = Number(range.value);
-          pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
-          updateOutput();
-        });
-
-        size.appendChild(range);
-        size.appendChild(pill);
-        card.appendChild(label);
-        card.appendChild(input);
-        card.appendChild(size);
-        fieldsRoot.appendChild(card);
-      });
-      updateOutput();
-    }
-
-    document.getElementById('copyBtn').addEventListener('click', async () => {
-      await navigator.clipboard.writeText(output.textContent);
-      alert('Copied siteContent config. Paste into index.html.');
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      location.reload();
-    });
-
-    render();
   </script>
 </body>
 </html>
