@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor3</title>
+  <title>Private CMS Editor4</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -456,7 +456,8 @@
 
       if (!doc.body.dataset.cmsCardCaptureBound) {
         doc.addEventListener('click', (event) => {
-          const card = event.target.closest('.project-card');
+          const target = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
+          const card = target?.closest?.('.project-card');
           if (!card || !projectEditMode) return;
           event.preventDefault();
           event.stopPropagation();
@@ -487,9 +488,39 @@
       doc.querySelectorAll('.project-card').forEach((card) => {
         const key = card.dataset.projectKey;
         if (!key) return;
-        card.style.outline = '1px solid rgba(93, 245, 255, 0.55)';
-        card.style.outlineOffset = '-1px';
+        card.style.outline = '2px solid rgba(93, 245, 255, 0.7)';
+        card.style.outlineOffset = '-2px';
+        card.style.boxShadow = 'inset 0 0 0 1px rgba(0, 0, 0, 0.45)';
         card.style.cursor = projectEditMode ? 'pointer' : '';
+
+        if (!card.querySelector('.cms-card-edit-badge')) {
+          const badge = doc.createElement('button');
+          badge.className = 'cms-card-edit-badge';
+          badge.type = 'button';
+          badge.textContent = 'Edit card';
+          badge.style.position = 'absolute';
+          badge.style.top = '10px';
+          badge.style.right = '10px';
+          badge.style.zIndex = '20';
+          badge.style.fontSize = '11px';
+          badge.style.padding = '5px 8px';
+          badge.style.borderRadius = '999px';
+          badge.style.border = '1px solid rgba(93, 245, 255, 0.75)';
+          badge.style.background = 'rgba(5, 14, 19, 0.82)';
+          badge.style.color = '#cff9ff';
+          badge.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            openProjectInspector(key);
+          }, true);
+          card.appendChild(badge);
+        }
+
+        const badge = card.querySelector('.cms-card-edit-badge');
+        if (badge) {
+          badge.style.display = projectEditMode ? 'inline-flex' : 'none';
+        }
 
         const title = card.querySelector('.card-title');
         if (title && state.projectOverrides[key]) {
