@@ -52,6 +52,8 @@
       <p class="muted">All fields are always visible here. Edits are saved locally and applied live to the preview + your site in this browser.</p>
       <div class="actions">
         <button id="saveBtn" class="primary">Save edits</button>
+        <button id="applyFileBtn">Apply to index.html file</button>
+        <button id="downloadIndexBtn">Download updated index.html</button>
         <button id="resetBtn">Reset defaults</button>
         <button id="openSiteBtn">Open site</button>
         <span id="saveStatus" class="muted" style="align-self:center;">Ready</span>
@@ -265,6 +267,31 @@
       broadcastState();
     }
 
+
+    function buildUpdatedIndexHtml(sourceHtml) {
+      const nextSite = `let siteContent = ${JSON.stringify(state.siteContent, null, 2)};`;
+      const nextProjects = `let projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
+
+      let updated = sourceHtml.replace(/let\s+siteContent\s*=\s*\{[\s\S]*?\};/, nextSite);
+      updated = updated.replace(/let\s+projectContentOverrides\s*=\s*\{[\s\S]*?\};/, nextProjects);
+      return updated;
+    }
+
+    async function fetchCurrentIndexHtml() {
+      const res = await fetch('/index.html', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Could not load index.html');
+      return await res.text();
+    }
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
     function unlockEditor() {
       if (keyInput.value !== EDITOR_KEY) {
         alert('Incorrect key.');
@@ -292,7 +319,7 @@
       saveState();
       postPreviewUpdate();
       broadcastState();
-      alert('Saved and pushed live to open site tabs in this browser.');
+      alert('Saved locally and pushed live to preview/open tabs.');
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
@@ -307,6 +334,48 @@
     document.getElementById('openSiteBtn').addEventListener('click', () => {
       window.open('/index.html', '_blank');
     });
+
+
+    document.getElementById('applyFileBtn').addEventListener('click', async () => {
+      if (!window.showOpenFilePicker) {
+        alert('Direct file apply is not supported in this browser. Use Download updated index.html instead.');
+        return;
+      }
+
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }],
+          excludeAcceptAllOption: false,
+          multiple: false
+        });
+
+        const file = await fileHandle.getFile();
+        const source = await file.text();
+        const updated = buildUpdatedIndexHtml(source);
+
+        const writable = await fileHandle.createWritable();
+        await writable.write(updated);
+        await writable.close();
+
+        if (saveStatus) saveStatus.textContent = 'Applied to file';
+        alert('Applied edits directly to selected index.html file.');
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        alert(`Apply failed: ${error.message}`);
+      }
+    });
+
+    document.getElementById('downloadIndexBtn').addEventListener('click', async () => {
+      try {
+        const source = await fetchCurrentIndexHtml();
+        const updated = buildUpdatedIndexHtml(source);
+        downloadTextFile('index.html', updated);
+        if (saveStatus) saveStatus.textContent = 'Downloaded index.html';
+      } catch (error) {
+        alert(`Download failed: ${error.message}`);
+      }
+    });
+
   </script>
 </body>
 </html>
