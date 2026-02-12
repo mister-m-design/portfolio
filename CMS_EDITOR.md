@@ -1,19 +1,20 @@
 # Private CMS Editor Guide
 
 ## Current editor version
-- **Version:** `v2.2.0`
+- **Version:** `v2.2.1`
 - **File:** `editor.html`
 - **Updated:** 2026-02-12
 
 ## How to verify you are on the latest editor
 1. Open `/editor.html`.
 2. Unlock with your key.
-3. In the CMS dock, confirm you see: **Editor version: v2.2.0**.
+3. In the CMS dock, confirm you see: **Editor version: v2.2.1**.
 4. If not, hard refresh (`Cmd/Ctrl + Shift + R`).
 
 ## Card editing behavior (important)
 When **Card edit mode: On**:
 - Rollover interactions are disabled for work cards.
+- Card images stay visible (dark hover overlay is suppressed in edit mode).
 - Cards show a cyan outline.
 - Each card shows an **Edit card** badge.
 - Clicking a card (or the badge) opens the project inspector instead of opening modal video playback.
