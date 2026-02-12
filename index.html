@@ -1,1000 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio of Michael Rush Murtha - Art Director">
-    <title>Michael Rush Murtha | Art Director</title>
-    
-    <!-- FAVICON -->
-    <link rel="icon" type="image/png" href="assets/portfolio/logo_assets/ICONBLACKNOBOX.png">
-
-    <!-- GOOGLE FONTS LOADER -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- FONT PAIRINGS -->
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Inter:wght@300;400;500;600;800&family=Lato:wght@300;400;700&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* --- 1. CORE STYLES & VARIABLES --- */
-        :root {
-            /* Default Dark Theme */
-            --bg-color: #050505;
-            --card-bg: #111111;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --header-gradient: linear-gradient(to bottom, rgba(5,5,5,0.95), rgba(5,5,5,0.0));
-            
-            --btn-bg: #ffffff;
-            --btn-text: #000000;
-            --input-bg: #1a1a1a;
-            --input-border: #333333;
-            
-            --icon-filter: invert(0); 
-            
-            /* BACKGROUND IMAGE OPACITY (Set to 1.0 for full visibility) */
-            --hero-bg-opacity: 1.0;
-            
-            /* DEFAULT FONTS (BOLD GOTHIC) */
-            --font-display: 'Archivo', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            
-            /* KERNING SETTINGS */
-            --tracking-display: -0.01em; 
-            --tracking-body: 0em;         
-            
-            --header-height: 100px;
-            --container-width: 1400px;
-        }
-
-        /* Light Theme Variables */
-        [data-theme="light"] {
-            --bg-color: #ffffff;
-            --card-bg: #f5f5f5;
-            --text-main: #000000;
-            --text-muted: #555555;
-            --header-gradient: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.0));
-            
-            --btn-bg: #000000;
-            --btn-text: #ffffff;
-            --input-bg: #f0f0f0;
-            --input-border: #e0e0e0;
-            
-            --icon-filter: invert(1);
-            
-            /* Hide background image in light mode so text remains readable */
-            --hero-bg-opacity: 0;
-        }
-
-        /* --- FONT THEMES --- */
-        body[data-font="gothic"] { --font-display: 'Archivo', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
-        body[data-font="inter"] { --font-display: 'Inter', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.025em; }
-        body[data-font="outfit"] { --font-display: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif; --tracking-display: -0.01em; }
-        body[data-font="modern"] { --font-display: 'Manrope', sans-serif; --font-body: 'Inter', sans-serif; --tracking-display: -0.01em; }
-        body[data-font="swiss"] { --font-display: 'DM Sans', sans-serif; --font-body: 'DM Sans', sans-serif; --tracking-display: -0.015em; }
-        body[data-font="studio"] { --font-display: 'Work Sans', sans-serif; --font-body: 'Work Sans', sans-serif; --tracking-display: -0.02em; }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            letter-spacing: var(--tracking-body);
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
-        a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
-        a:hover { opacity: 0.6; }
-        img { display: block; max-width: 100%; }
-
-        /* --- 2. STYLE SWITCHER PANEL --- */
-        #stylePanel {
-            position: fixed; top: 80px; right: 20px; width: 320px;
-            background: var(--card-bg); border: 1px solid var(--text-muted);
-            padding: 1.5rem; z-index: 6000; display: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-radius: 8px;
-        }
-        #stylePanel.visible { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
-
-        .panel-header {
-            font-family: 'Inter', sans-serif; font-size: 0.8rem;
-            text-transform: uppercase; letter-spacing: 0.1em;
-            color: var(--text-muted); margin-bottom: 1rem; padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--text-muted); display: flex; justify-content: space-between;
-        }
-
-        .font-option {
-            display: flex; flex-direction: column; padding: 0.8rem;
-            margin-bottom: 0.5rem; border: 1px solid transparent;
-            cursor: pointer; transition: all 0.2s; border-radius: 4px;
-        }
-        .font-option:hover { background: rgba(128,128,128,0.1); }
-        .font-option.active { border-color: var(--text-main); background: rgba(128,128,128,0.05); }
-        .font-name-display { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
-        .font-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-family: 'Inter', sans-serif; }
-        /* --- 3. LAYOUT & HEADER --- */
-        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
-
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: var(--header-gradient); z-index: 1000;
-            display: flex; align-items: center; transition: background 0.4s ease;
-        }
-
-        .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; }
-        .branding { display: flex; align-items: center; gap: 15px; }
-        .logo-icon { width: 40px; height: auto; filter: var(--icon-filter); transition: filter 0.3s ease; }
-        
-        .brand-name { 
-            font-family: var(--font-display); 
-            font-weight: 800; 
-            font-size: 1.1rem; 
-            text-transform: uppercase; 
-            letter-spacing: var(--tracking-display); 
-            color: var(--text-main); 
-        }
-
-        .nav-right { display: flex; align-items: center; gap: 1.5rem; }
-        .nav-links { display: flex; gap: 3rem; margin-right: 1.5rem;}
-        .nav-links li { list-style: none; }
-        .nav-links li a { 
-            font-family: var(--font-body); 
-            font-size: 0.85rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            color: var(--text-main); 
-            font-weight: 500; 
-        }
-
-        .ui-btn {
-            background: transparent; border: 1px solid var(--text-muted);
-            color: var(--text-main); padding: 0; cursor: pointer;
-            border-radius: 50%; width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease; opacity: 0.6;
-        }
-        .ui-btn:hover, .ui-btn.active { opacity: 1; border-color: var(--text-main); background: rgba(255,255,255,0.1); }
-        .font-label { font-family: serif; font-weight: 700; font-size: 1.1rem; }
-
-        /* --- 4. HERO --- */
-        .hero {
-            min-height: min(88vh, 820px);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
-            background-color: var(--bg-color);
-            overflow: hidden;
-            padding: calc(var(--header-height) + 2rem) 0 3rem;
-        }
-        .hero-bg {
-            position: absolute; 
-            top: 0; 
-            right: 0; 
-            width: 44%; 
-            height: 100%;
-            
-            background-image: url('assets/images/M3_Main.png'); 
-            
-            /* Ensure the whole image is visible */
-            background-size: contain; 
-            background-position: center right; 
-            background-repeat: no-repeat;
-            
-            opacity: var(--hero-bg-opacity); 
-            filter: none; /* NO GRAYSCALE - FULL COLOR */
-            transition: opacity 0.5s ease; 
-            z-index: 0;
-        }
-        .hero-container { position: relative; z-index: 2; width: 100%; max-width: var(--container-width); margin: 0 auto; padding: 0 4rem; }
-        .hero-content { max-width: 780px; opacity: 0; transform: translateY(30px); transition: opacity 1s, transform 1s; }
-        .hero-content.visible { opacity: 1; transform: translateY(0); }
-
-        .hero h1 { 
-            font-family: var(--font-display); 
-            font-size: clamp(3rem, 6vw, 7.5rem); 
-            font-weight: 800; 
-            line-height: 1.05; 
-            margin-bottom: 1.5rem; 
-            color: var(--text-main); 
-            letter-spacing: var(--tracking-display);
-        }
-        
-        .hero p { 
-            font-family: var(--font-body); 
-            font-size: 1.2rem; 
-            color: var(--text-muted); 
-            margin-bottom: 2rem; 
-            font-weight: 400; 
-            max-width: 750px; 
-            line-height: 1.7; 
-        }
-
-        .hero-kicker {
-            font-family: var(--font-body);
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: var(--text-muted);
-            margin-bottom: 1.2rem;
-        }
-
-        .hero-stats {
-            margin-top: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(140px, 1fr));
-            gap: 1rem;
-            max-width: 720px;
-        }
-
-        .hero-stat {
-            border: 1px solid var(--input-border);
-            background: rgba(255, 255, 255, 0.03);
-            padding: 1rem 1.1rem;
-        }
-
-        .hero-stat-value {
-            font-family: var(--font-display);
-            font-size: 1.6rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .hero-stat-label {
-            margin-top: 0.45rem;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--text-muted);
-        }
-
-        .play-btn {
-            display: inline-flex; align-items: center; gap: 15px; padding: 1rem 2.5rem;
-            background: var(--btn-bg); color: var(--btn-text);
-            font-family: var(--font-display); font-size: 0.9rem; text-transform: uppercase;
-            letter-spacing: 0.1em; font-weight: 700; border: 1px solid var(--btn-bg);
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .play-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); opacity: 0.9; }
-
-        /* --- 5. GALLERY --- */
-        .gallery-section { padding: 4.25rem 0; background: var(--bg-color); transition: background 0.4s; }
-        .section-header { margin-bottom: 2rem; border-bottom: 1px solid var(--text-muted); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end; opacity: 0.6; }
-        
-        .section-title { 
-            font-family: var(--font-display); font-size: 1rem; 
-            letter-spacing: 0.02em; font-weight: 700; color: var(--text-main); 
-        }
-        
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 2.5rem; }
-        .project-card { background: var(--card-bg); cursor: pointer; position: relative; overflow: hidden; aspect-ratio: 16/9; }
-        .project-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s, opacity 0.5s; opacity: 0.9; }
-        [data-theme="light"] .project-card img { opacity: 1; }
-        .card-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); opacity: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s; backdrop-filter: blur(4px); }
-        .project-card:hover img { transform: scale(1.03); opacity: 1; }
-        .project-card:hover .card-overlay { opacity: 1; }
-        
-        .card-title { 
-            font-family: var(--font-display); 
-            font-size: 2rem; 
-            font-weight: 800; 
-            color: white; 
-            text-align: center; 
-            margin-bottom: 0.5rem; 
-            transform: translateY(10px); 
-            transition: transform 0.4s; 
-            letter-spacing: var(--tracking-display);
-        }
-        
-        .project-card:hover .card-title { transform: translateY(0); }
-        .card-action { font-family: var(--font-body); font-size: 0.8rem; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; text-transform: uppercase; }
-
-        .card-meta {
-            margin-top: 0.5rem;
-            font-family: var(--font-body);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* --- 7. FLOATING PLAYER (PIP) --- */
-        #floatingPlayer { 
-            position: fixed; 
-            bottom: 40px; right: 40px; 
-            width: 1100px; max-width: 90vw; aspect-ratio: 16/9; 
-            background: #000; z-index: 5000; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
-            display: none; animation: slideIn 0.6s; 
-        }
-        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .floating-header { position: absolute; top: -40px; right: 0; }
-        .close-float { background: var(--text-main); color: var(--bg-color); border: none; width: 32px; height: 32px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-
-        /* --- 8. EXPANDED PROJECT MODAL --- */
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.98); z-index: 2000; 
-            display: none; opacity: 0; transition: opacity 0.4s; 
-            overflow-y: auto; 
-            padding: 2rem 0;
-        }
-        [data-theme="light"] .modal { background: rgba(255,255,255,0.98); }
-        .modal.open { display: block; opacity: 1; }
-        
-        .modal-container { 
-            width: 100%; max-width: 1400px; margin: 0 auto; 
-            padding: 2rem 4rem; position: relative; 
-            min-height: 100%; display: flex; flex-direction: column; 
-        }
-
-        .close-modal { 
-            position: absolute; top: 2rem; right: 2rem; 
-            color: var(--text-main); font-size: 2.5rem; 
-            cursor: pointer; background: none; border: none; z-index: 2001; 
-            font-family: var(--font-display); 
-        }
-
-        /* DYNAMIC VIDEO CONTAINER */
-        #videoContainer {
-            width: 100%;
-            margin-bottom: 3rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .video-wrapper { 
-            width: 100%; aspect-ratio: 16/9; background: #000; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
-        }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        .project-details { 
-            display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; 
-            margin-bottom: 4rem; 
-        }
-        
-        #modalTitle { 
-            font-family: var(--font-display); color: var(--text-main); 
-            font-weight: 800; font-size: 2.5rem; 
-            letter-spacing: var(--tracking-display); 
-            line-height: 1;
-        }
-        
-        #modalDesc {
-            font-family: var(--font-body); color: var(--text-muted);
-            font-size: 1.1rem; line-height: 1.7;
-        }
-
-        #modalMeta {
-            margin-top: 1.25rem;
-            display: grid;
-            gap: 0.4rem;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .style-frames-header {
-            font-family: var(--font-display); font-size: 1rem;
-            text-transform: uppercase; letter-spacing: 0.1em;
-            color: var(--text-muted); margin-bottom: 2rem;
-            border-bottom: 1px solid var(--text-muted); padding-bottom: 1rem;
-        }
-        
-        .style-frames-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-        
-        .style-frame {
-            width: 100%; height: auto; border-radius: 4px;
-            background: var(--card-bg);
-            cursor: zoom-in;
-            transition: transform 0.2s;
-        }
-        
-        .style-frame:hover { transform: scale(1.01); }
-
-        /* --- 9. LIGHTBOX --- */
-        #lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.99); z-index: 6000;
-            display: none; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        #lightbox.visible { display: flex; opacity: 1; }
-        #lightboxImg { max-width: 95%; max-height: 95%; object-fit: contain; }
-        .close-lightbox {
-            position: absolute; top: 2rem; right: 2rem;
-            color: white; font-size: 3rem; background: none;
-            border: none; cursor: pointer; font-family: sans-serif;
-        }
-
-        /* --- 10. FOOTER --- */
-        footer { border-top: 1px solid var(--text-muted); padding: 4rem 0; background: var(--bg-color); transition: background 0.4s; opacity: 0.9; }
-        .footer-content { display: flex; justify-content: space-between; align-items: flex-start; }
-        .footer-left { display: flex; flex-direction: column; gap: 1rem; }
-        .copyright { font-family: var(--font-body); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
-        .footer-email { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--text-main); border-bottom: 2px solid transparent; transition: border-color 0.3s; display: inline-block; text-decoration: none; padding-bottom: 2px; }
-        .footer-email:hover { border-color: var(--text-main); }
-        .social-icons { display: flex; gap: 2rem; }
-        .social-icons img { height: 24px; width: auto; opacity: 0.6; transition: opacity 0.3s; filter: var(--logo-filter); }
-        .social-icons img:hover { opacity: 1; }
-
-        /* --- MOBILE --- */
-        @media (max-width: 900px) {
-            .container { padding: 0 2rem; }
-            .hero { min-height: auto; padding: calc(var(--header-height) + 1.5rem) 0 2rem; }
-            .hero h1 { font-size: 4rem; }
-            .hero-stats { grid-template-columns: 1fr; max-width: 320px; }
-            .gallery { grid-template-columns: 1fr; gap: 2rem; }
-            .project-details { grid-template-columns: 1fr; gap: 2rem; }
-            .modal-container { padding: 4rem 1.5rem; }
-            .close-modal { top: 1rem; right: 1.5rem; }
-        }
-        @media (max-width: 600px) {
-            .nav-links { display: none; }
-            .hero-container { padding: 0 1.5rem; }
-            .hero-bg { width: 100%; opacity: 0.25; }
-            .hero h1 { font-size: 2.8rem; }
-            #floatingPlayer { width: 92vw; right: 4vw; bottom: 20px; }
-            .footer-content { flex-direction: column; gap: 3rem; }
-            #stylePanel { width: 90%; right: 5%; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Site Editor</title>
+  <style>
+    :root { --bg:#0c0d10; --panel:#15171d; --muted:#9aa1b2; --text:#eef2ff; --border:#2c313d; --accent:#9ea7ff; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, sans-serif; background:var(--bg); color:var(--text); }
+    .gate { max-width:420px; margin:14vh auto; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+    .hidden { display:none !important; }
+    .shell { display:grid; grid-template-columns: 430px 1fr; gap:1rem; min-height:100vh; padding:1rem; }
+    .left { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:0.9rem; overflow:auto; max-height:calc(100vh - 2rem); }
+    .right { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#050505; min-height:calc(100vh - 2rem); }
+    .row { display:flex; gap:.6rem; align-items:center; }
+    h1 { font-size:1.05rem; margin:.1rem 0; }
+    .muted { color:var(--muted); font-size:.84rem; }
+    .section { margin-top:1rem; border-top:1px solid var(--border); padding-top:.8rem; }
+    .section h2 { margin:0 0 .5rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    .field { border:1px solid var(--border); border-radius:9px; padding:.55rem; margin-bottom:.55rem; background:#11131a; }
+    .label { display:block; font-size:.73rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.35rem; }
+    input[type='text'], textarea, input[type='password'] { width:100%; background:#0d0f14; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:.5rem .6rem; }
+    textarea { min-height:78px; resize:vertical; }
+    .size { display:grid; grid-template-columns:1fr auto; gap:.45rem; align-items:center; margin-top:.45rem; }
+    input[type='range'] { width:100%; accent-color:var(--accent); }
+    .pill { border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.72rem; padding:.2rem .45rem; min-width:64px; text-align:center; }
+    .actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem; }
+    button { border:1px solid var(--border); border-radius:8px; background:#11141d; color:var(--text); padding:.5rem .7rem; cursor:pointer; }
+    .primary { background:var(--accent); color:#111; border-color:transparent; font-weight:700; }
+    iframe { width:100%; height:100%; border:0; }
+    pre { white-space:pre-wrap; max-height:220px; overflow:auto; margin:.6rem 0 0; background:#0d0f14; border:1px solid var(--border); border-radius:8px; padding:.7rem; font-size:.75rem; }
+    @media (max-width: 1100px) { .shell { grid-template-columns:1fr; } .right { min-height:70vh; } .left { max-height:none; } }
+  </style>
 </head>
 <body>
+  <div id="gate" class="gate">
+    <h1>Private editor</h1>
+    <p class="muted">Separate from homepage. Enter your key to unlock the editor and live preview.</p>
+    <label class="label" for="key">Editor key</label>
+    <input id="key" type="password" />
+    <div class="actions"><button id="unlock" class="primary">Unlock</button></div>
+  </div>
 
-    <!-- FONT PICKER PANEL -->
-    <div id="stylePanel">
-        <div class="panel-header">
-            <span>Typography Styles</span>
-            <span style="cursor:pointer" onclick="document.getElementById('stylePanel').classList.remove('visible')">✕</span>
-        </div>
-        <!-- DEFAULT IS BOLD GOTHIC -->
-        <div class="font-option active" onclick="setFont('gothic', this)">
-            <div class="font-name-display" style="font-family: 'Archivo', sans-serif;">Bold Gothic</div>
-            <div class="font-meta">Bold American Gothic</div>
-        </div>
-        <div class="font-option" onclick="setFont('inter', this)">
-            <div class="font-name-display" style="font-family: 'Inter', sans-serif;">Inter Display</div>
-            <div class="font-meta">Swiss International Style</div>
-        </div>
-        <div class="font-option" onclick="setFont('outfit', this)">
-            <div class="font-name-display" style="font-family: 'Outfit', sans-serif;">Outfit + Jakarta</div>
-            <div class="font-meta">Bold Geometric</div>
-        </div>
-        <div class="font-option" onclick="setFont('modern', this)">
-            <div class="font-name-display" style="font-family: 'Manrope', sans-serif;">Manrope + Inter</div>
-            <div class="font-meta">Classic Geometric</div>
-        </div>
-        <div class="font-option" onclick="setFont('swiss', this)">
-            <div class="font-name-display" style="font-family: 'DM Sans', sans-serif;">DM Sans</div>
-            <div class="font-meta">Minimal Grotesk</div>
-        </div>
-        <div class="font-option" onclick="setFont('studio', this)">
-            <div class="font-name-display" style="font-family: 'Work Sans', sans-serif;">Work Sans</div>
-            <div class="font-meta">Design Studio Clean</div>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <header>
-        <div class="container nav-container">
-            <a href="#" class="branding">
-                <img src="assets/portfolio/logo_assets/ICONWHITENOBOX.png" alt="Logo" class="logo-icon">
-                <span class="brand-name" id="brandName">Michael Rush Murtha</span>
-            </a>
-            <div class="nav-right">
-                <ul class="nav-links">
-                    <li><a href="#work">Work</a></li>
-                </ul>
-                <button class="ui-btn" id="fontToggle" aria-label="Choose Font"><span class="font-label">Aa</span></button>
-                <button class="ui-btn" id="themeToggle" aria-label="Switch Theme">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Splash Page / Hero -->
-    <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-container">
-            <div class="hero-content" id="hero-content">
-                <div class="hero-kicker" id="heroKicker">Motion Graphics • Main Title Design • Visual Development</div>
-                <h1 id="heroTitle">Title Design for<br>Film, TV, & Games</h1>
-                <p id="heroDescription">I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.</p>
-                <button class="play-btn" id="heroCta" onclick="openFloatingReel('74537740')">▶ Watch Reel</button>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" id="heroStat1Value">15+</div>
-                        <div class="hero-stat-label" id="heroStat1Label">Years in design + VFX</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" id="heroStat2Value">20+</div>
-                        <div class="hero-stat-label" id="heroStat2Label">Major film / TV / game credits</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" id="heroStat3Value">End-to-End</div>
-                        <div class="hero-stat-label" id="heroStat3Label">Concept, design, animation, comp</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <main id="app" class="shell hidden">
+    <section class="left">
+      <h1>Site Content Editor</h1>
+      <p class="muted">Edits update live preview instantly. Includes card/modal copy for every project image.</p>
+      <div class="actions">
+        <button id="copyConfig" class="primary">Copy config</button>
+        <button id="reloadDefaults">Reload defaults</button>
+      </div>
+      <div class="section">
+        <h2>Main site text</h2>
+        <div id="siteFields"></div>
+      </div>
+      <div class="section">
+        <h2>Project image text (cards + modal)</h2>
+        <div id="projectFields"></div>
+      </div>
+      <pre id="output"></pre>
     </section>
+    <section class="right"><iframe id="preview" src="index.html"></iframe></section>
+  </main>
 
-    <!-- Main Grid -->
-    <main id="work" class="gallery-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" id="workHeading">Selected Works</h2>
-                <div class="section-title" id="workSubheading">Project Context + Contributions</div>
-            </div>
-            <div id="gallery-grid" class="gallery"></div>
-        </div>
-    </main>
+  <script>
+    const EDITOR_KEY = 'mrm-private-editor';
+    const gate = document.getElementById('gate');
+    const app = document.getElementById('app');
+    const keyInput = document.getElementById('key');
+    const preview = document.getElementById('preview');
 
-    <!-- Footer -->
-    <footer id="footer">
-        <div class="container footer-content">
-            <div class="footer-left">
-                <a href="mailto:mmurtha@gmail.com" class="footer-email" id="footerEmail">mmurtha@gmail.com</a>
-                <div class="copyright" id="copyrightText">&copy; 2024 Michael Rush Murtha</div>
-            </div>
-            <div class="social-icons">
-                <a href="https://vimeo.com/user16395134" target="_blank"><img src="assets/socialIcons/vimeo_White.png" alt="Vimeo"></a>
-                <a href="https://www.linkedin.com/in/michael-murtha-470a431/" target="_blank"><img src="assets/socialIcons/linkedin_White.png" alt="LinkedIn"></a>
-            </div>
-        </div>
-    </footer>
+    const state = { siteContent: {}, projectContent: {} };
 
-    <!-- Players & Modals -->
-    <div id="floatingPlayer">
-        <div class="floating-header"><button class="close-float" onclick="closeFloatingReel()">✕</button></div>
-        <iframe id="floatFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-    </div>
+    const fallbackSnapshot = {
+      siteContent: {
+        brandName: { text: 'Michael Rush Murtha', size: 1.1 },
+        heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
+        heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
+        heroDescription: { text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.', size: 1.2 },
+        heroCta: { text: '▶ Watch Reel', size: 0.9 },
+        heroStat1Value: { text: '15+', size: 1.6 },
+        heroStat1Label: { text: 'Years in design + VFX', size: 0.7 },
+        heroStat2Value: { text: '20+', size: 1.6 },
+        heroStat2Label: { text: 'Major film / TV / game credits', size: 0.7 },
+        heroStat3Value: { text: 'End-to-End', size: 1.6 },
+        heroStat3Label: { text: 'Concept, design, animation, comp', size: 0.7 },
+        workHeading: { text: 'Selected Works', size: 1 },
+        workSubheading: { text: 'Project Context + Contributions', size: 1 },
+        framesHeader: { text: 'Style Frames', size: 1 },
+        footerEmail: { text: 'mmurtha@gmail.com', size: 1.2 },
+        copyrightText: { text: '&copy; 2024 Michael Rush Murtha', size: 0.8 }
+      },
+      projectContent: {
+        'assets/thumbs/WICKED.png': { title: 'Wicked', category: 'Film Campaign', role: 'Motion Designer / Art Director', year: '2024', studio: 'Campaign / AV', deliverables: 'Main-on-end graphics, transitions, atmospheric FX', description: "Designed a fantasy-led motion language using particles, glows, and elegant transitions to match the film's magical tone." },
+        'assets/thumbs/FURIOSA.png': { title: 'Furiosa', category: 'Film', role: 'Motion Designer', year: '2024', studio: 'Entertainment Marketing', deliverables: 'Title cards, grit textures, kinetic transitions', description: 'Built aggressive visual treatments and typography timing for high-energy trailer moments and campaign assets.' },
+        'FLASH.jpg': { title: 'The Flash', category: 'Feature Film', role: 'VFX Supervisor', year: '2023', studio: 'Warner Bros.', deliverables: 'Speed force visuals, electric simulation beats', description: 'Supervised key speed force sequences with an emphasis on physical energy behavior and cinematic readability.' },
+        'INK2.jpg': { title: 'Ink', category: 'R&D / Personal', role: 'Director + Animator', year: '2023', studio: 'Independent', deliverables: 'Fluid simulation, look development', description: 'Personal R&D study focused on fluid dynamics, macro photography references, and stylized compositing.' },
+        'GODZILLAMW.png': { title: 'Godzilla MW', category: 'Feature Integration', role: 'Lead Motion Designer', year: '2022', studio: 'Legendary / Promo', deliverables: 'Creature-themed UI, destruction motifs', description: 'Designed and animated brand-integrated graphics with heavy Houdini simulation and compositing support.' },
+        'MW3.jpg': { title: 'Modern Warfare 3', category: 'Game Cinematics', role: 'UI / HUD Designer', year: '2023', studio: 'Activision', deliverables: 'Mission UI, tactical overlays, data animation', description: 'Crafted militarized interface design for cinematic gameplay moments with clarity-first animation systems.' },
+        'SHE_HULK_STILL.jpg': { title: 'She Hulk', category: 'Series', role: 'Motion Graphics Designer', year: '2022', studio: 'Marvel / Disney+', deliverables: 'Courtroom graphics, lower thirds, transitions', description: 'Developed courtroom-style informational graphics and lower thirds to support tone and legal-comedy pacing.' },
+        'SKELCREW.png': { title: 'Skeleton Crew', category: 'Series', role: 'Lead Motion Designer', year: '2024', studio: 'Lucasfilm', deliverables: 'Textured motion language, episodic graphics', description: 'Led motion design direction focused on tactile textures, distressed typography, and world-consistent interface graphics.' },
+        'NYSM2.png': { title: 'Now You See Me 2', category: 'Feature Film', role: 'VFX Artist', year: '2016', studio: 'Lionsgate', deliverables: 'Card trails, reveal composites', description: 'Designed and composited stylized card-throwing visuals with precision-timed FX for major illusion beats.' },
+        'JESSICAJONES.png': { title: 'Jessica Jones', category: 'Main Title', role: 'Title Designer', year: '2015', studio: 'Marvel / Netflix', deliverables: 'Title sequence, painterly motion system', description: 'Created a noir comic-inspired title sequence blending watercolor textures with moody, investigative pacing.' },
+        'KFP.jpg': { title: 'Kung Fu Panda', category: 'Animated Promo', role: 'Motion Designer', year: '2016', studio: 'DreamWorks', deliverables: 'Broadcast package, energetic transitions', description: 'Developed a playful, high-tempo promo package with character-aligned timing and expressive graphic transitions.' },
+        'RAMPAGEOPEN.jpg': { title: 'Rampage', category: 'Main Title', role: 'Title Designer', year: '2018', studio: 'Warner Bros.', deliverables: 'Opening title sequence, mutation motifs', description: 'Designed a mutation-driven title sequence using biological forms, data overlays, and aggressive scale transitions.' }
+      }
+    };
 
-    <!-- EXPANDED MODAL -->
-    <div id="videoModal" class="modal">
-        <div class="modal-container">
-            <button class="close-modal" onclick="closeModal()">✕</button>
-            <div id="videoContainer"></div> <!-- Dynamic container for videos -->
-            <div class="project-details">
-                <div>
-                    <div id="modalTitle">Project Title</div>
-                    <div id="modalMeta"></div>
-                </div>
-                <div id="modalDesc">Project description goes here...</div>
-            </div>
-            <div class="style-frames-header" id="framesHeader">Style Frames</div>
-            <div id="framesGrid" class="style-frames-grid"></div>
-        </div>
-    </div>
+    function canAccessPreview() {
+      try {
+        return Boolean(preview.contentWindow && preview.contentWindow.document);
+      } catch {
+        return false;
+      }
+    }
 
-    <!-- LIGHTBOX -->
-    <div id="lightbox" onclick="closeLightbox()">
-        <button class="close-lightbox" onclick="closeLightbox()">✕</button>
-        <img id="lightboxImg" src="" alt="Full Screen">
-    </div>
+    function postPreviewUpdate() {
+      preview.contentWindow.postMessage({
+        type: 'portfolio-preview-update',
+        payload: {
+          siteContent: state.siteContent,
+          projectOverrides: state.projectContent
+        }
+      }, window.location.origin);
+      renderOutput();
+    }
 
-    <script>
-        // 1. THEME LOGIC
-        const themeBtn = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        themeBtn.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme');
-            html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    function renderOutput() {
+      const out = `const siteContent = ${JSON.stringify(state.siteContent, null, 2)};\n\nconst projectContentOverrides = ${JSON.stringify(state.projectContent, null, 2)};`;
+      document.getElementById('output').textContent = out;
+    }
+
+    function makeSiteField(id, config) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${id}</label>`;
+
+      const input = document.createElement('textarea');
+      input.value = config.text;
+      input.addEventListener('input', () => { state.siteContent[id].text = input.value; postPreviewUpdate(); });
+
+      const row = document.createElement('div'); row.className = 'size';
+      const range = document.createElement('input'); range.type = 'range'; range.min = '0.55'; range.max = '8'; range.step = '0.05'; range.value = String(config.size || 1);
+      const pill = document.createElement('span'); pill.className = 'pill'; pill.textContent = `${range.value}rem`;
+      range.addEventListener('input', () => {
+        state.siteContent[id].size = Number(range.value);
+        pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
+        postPreviewUpdate();
+      });
+      row.appendChild(range); row.appendChild(pill);
+      box.appendChild(input); box.appendChild(row);
+      return box;
+    }
+
+    function makeProjectField(projectKey, config) {
+      const box = document.createElement('div');
+      box.className = 'field';
+      box.innerHTML = `<label class="label">${config.title || projectKey} <span class="muted">(${projectKey})</span></label>`;
+
+      ['title','category','role','year','studio','deliverables','description'].forEach((key) => {
+        const label = document.createElement('label');
+        label.className = 'label';
+        label.textContent = key;
+
+        const input = document.createElement(key === 'description' ? 'textarea' : 'input');
+        if (key !== 'description') input.type = 'text';
+        input.value = config[key] ?? '';
+        input.addEventListener('input', () => {
+          state.projectContent[projectKey][key] = input.value;
+          postPreviewUpdate();
         });
 
-        // 2. FONT LOGIC
-        const fontBtn = document.getElementById('fontToggle');
-        const stylePanel = document.getElementById('stylePanel');
-        const fontOptions = document.querySelectorAll('.font-option');
-        fontBtn.addEventListener('click', () => {
-            stylePanel.classList.toggle('visible');
-            fontBtn.classList.toggle('active');
-        });
-        function setFont(fontName, element) {
-            document.body.setAttribute('data-font', fontName);
-            fontOptions.forEach(opt => opt.classList.remove('active'));
-            element.classList.add('active');
-        }
+        box.appendChild(label);
+        box.appendChild(input);
+      });
 
-        // 3. SITE CONTENT CONFIG
-        let siteContent = {
-        const siteContent = {
-            brandName: { text: 'Michael Rush Murtha', size: 1.1 },
-            heroKicker: { text: 'Motion Graphics • Main Title Design • Visual Development', size: 0.78 },
-            heroTitle: { text: 'Title Design for<br>Film, TV, & Games', size: 5.3 },
-            heroDescription: { text: 'I design cinematic motion graphics for film, TV, and games—from opening titles and show packages to realtime screen graphics. This site is a focused selection of work I’ve crafted across concept, design, and final execution.', size: 1.2 },
-            heroCta: { text: '▶ Watch Reel', size: 0.9 },
-            heroStat1Value: { text: '15+', size: 1.6 },
-            heroStat1Label: { text: 'Years in design + VFX', size: 0.7 },
-            heroStat2Value: { text: '20+', size: 1.6 },
-            heroStat2Label: { text: 'Major film / TV / game credits', size: 0.7 },
-            heroStat3Value: { text: 'End-to-End', size: 1.6 },
-            heroStat3Label: { text: 'Concept, design, animation, comp', size: 0.7 },
-            workHeading: { text: 'Selected Works', size: 1 },
-            workSubheading: { text: 'Project Context + Contributions', size: 1 },
-            framesHeader: { text: 'Style Frames', size: 1 },
-            footerEmail: { text: 'mmurtha@gmail.com', size: 1.2 },
-            copyrightText: { text: '&copy; 2024 Michael Rush Murtha', size: 0.8 }
-        };
+      return box;
+    }
 
-        function applySiteContent(contentConfig) {
-            Object.entries(contentConfig).forEach(([id, content]) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (typeof content.text === 'string') el.innerHTML = content.text;
-                if (content.size) el.style.fontSize = `${content.size}rem`;
-            });
-        }
+    function renderForms() {
+      const siteRoot = document.getElementById('siteFields');
+      const projectRoot = document.getElementById('projectFields');
+      siteRoot.innerHTML = '';
+      projectRoot.innerHTML = '';
 
-        applySiteContent(siteContent);
+      Object.entries(state.siteContent).forEach(([id, config]) => {
+        siteRoot.appendChild(makeSiteField(id, config));
+      });
 
-        const projectContentOverrides = {};
+      Object.entries(state.projectContent).forEach(([projectKey, config]) => {
+        projectRoot.appendChild(makeProjectField(projectKey, config));
+      });
 
-        function applyProjectOverrides(sourceProjects, overrides = {}) {
-            return sourceProjects.map((project) => {
-                const override = overrides[project.file];
-                if (!override) return { ...project };
-                return {
-                    ...project,
-                    title: override.title ?? project.title,
-                    category: override.category ?? project.category,
-                    role: override.role ?? project.role,
-                    year: override.year ?? project.year,
-                    studio: override.studio ?? project.studio,
-                    deliverables: override.deliverables ?? project.deliverables,
-                    description: override.description ?? project.description
-                };
-            });
-        }
+      renderOutput();
+    }
 
-        function getProjectContentSnapshot(currentProjects) {
-            return currentProjects.reduce((acc, project) => {
-                acc[project.file] = {
-                    title: project.title,
-                    category: project.category,
-                    role: project.role,
-                    year: project.year,
-                    studio: project.studio,
-                    deliverables: project.deliverables,
-                    description: project.description
-                };
-                return acc;
-            }, {});
-        }
+    function deepClone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
 
-        function applyEditorPreviewUpdate(payload = {}) {
-            if (payload.siteContent) {
-                siteContent = payload.siteContent;
-                applySiteContent(siteContent);
-            }
+    function hydrateFromPreview() {
+      if (!canAccessPreview()) {
+        state.siteContent = deepClone(fallbackSnapshot.siteContent);
+        state.projectContent = deepClone(fallbackSnapshot.projectContent);
+        renderForms();
+        return;
+      }
 
-            if (payload.projectOverrides) {
-                projects = applyProjectOverrides(baseProjects, payload.projectOverrides);
-                renderGallery();
-            }
-        }
+      const getSnapshot = preview.contentWindow.getPortfolioEditorSnapshot;
+      if (typeof getSnapshot !== 'function') {
+        state.siteContent = deepClone(fallbackSnapshot.siteContent);
+        state.projectContent = deepClone(fallbackSnapshot.projectContent);
+        renderForms();
+        return;
+      }
 
-        window.getPortfolioEditorSnapshot = function getPortfolioEditorSnapshot() {
-            return {
-                siteContent,
-                projectContent: getProjectContentSnapshot(projects)
-            };
-        };
+      const snapshot = getSnapshot();
+      state.siteContent = deepClone(snapshot.siteContent || fallbackSnapshot.siteContent);
+      state.projectContent = deepClone(snapshot.projectContent || fallbackSnapshot.projectContent);
+      renderForms();
+      postPreviewUpdate();
+    }
 
-        window.addEventListener('message', (event) => {
-            const data = event.data || {};
-            if (data.type !== 'portfolio-preview-update') return;
-            applyEditorPreviewUpdate(data.payload);
-        });
+    function unlockEditor() {
+      if (keyInput.value !== EDITOR_KEY) {
+        alert('Incorrect key.');
+        return;
+      }
+      sessionStorage.setItem('editorUnlocked', '1');
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+      if (preview.contentWindow?.document?.readyState === 'complete') hydrateFromPreview();
+    }
 
-        // 4. PROJECT DATA
-        const baseProjects = [
-        // 4. PROJECT DATA
-        const projects = [
-            {
-                title: "Wicked",
-                file: "assets/thumbs/WICKED.png",
-                vimeo: "1142152199",
-                category: "Film Campaign",
-                role: "Motion Designer / Art Director",
-                year: "2024",
-                studio: "Campaign / AV",
-                deliverables: "Main-on-end graphics, transitions, atmospheric FX",
-                description: "Designed a fantasy-led motion language using particles, glows, and elegant transitions to match the film's magical tone.",
-                frames: ["assets/stills/wicked/wicked1.png", "assets/stills/wicked/wicked2.png", "assets/stills/wicked/wicked3.png"]
-            },
-            {
-                title: "Furiosa",
-                file: "assets/thumbs/FURIOSA.png",
-                vimeo: ["1142155470", "1142155443"],
-                category: "Film",
-                role: "Motion Designer",
-                year: "2024",
-                studio: "Entertainment Marketing",
-                deliverables: "Title cards, grit textures, kinetic transitions",
-                description: "Built aggressive visual treatments and typography timing for high-energy trailer moments and campaign assets.",
-                frames: ["assets/stills/furiosa/furiosa1.png", "assets/stills/furiosa/furiosa2.png", "assets/stills/furiosa/furiosa3.png"]
-            },
-            {
-                title: "The Flash",
-                file: "FLASH.jpg",
-                vimeo: "914963553",
-                category: "Feature Film",
-                role: "VFX Supervisor",
-                year: "2023",
-                studio: "Warner Bros.",
-                deliverables: "Speed force visuals, electric simulation beats",
-                description: "Supervised key speed force sequences with an emphasis on physical energy behavior and cinematic readability.",
-                frames: ["assets/stills/flash/flash1.png", "assets/stills/flash/flash2.png", "assets/stills/flash/flash3.png"]
-            },
-            {
-                title: "Ink",
-                file: "INK2.jpg",
-                vimeo: "915781397",
-                category: "R&D / Personal",
-                role: "Director + Animator",
-                year: "2023",
-                studio: "Independent",
-                deliverables: "Fluid simulation, look development",
-                description: "Personal R&D study focused on fluid dynamics, macro photography references, and stylized compositing.",
-                frames: ["assets/stills/ink/ink01.png", "assets/stills/ink/ink02.png", "assets/stills/ink/ink03.png"]
-            },
-            {
-                title: "Godzilla MW",
-                file: "GODZILLAMW.png",
-                vimeo: "913926442",
-                category: "Feature Integration",
-                role: "Lead Motion Designer",
-                year: "2022",
-                studio: "Legendary / Promo",
-                deliverables: "Creature-themed UI, destruction motifs",
-                description: "Designed and animated brand-integrated graphics with heavy Houdini simulation and compositing support.",
-                frames: ["assets/stills/godzilla/gdzl01.png", "assets/stills/godzilla/gdzl02.png", "assets/stills/godzilla/gdzl03.png", "assets/stills/godzilla/gdzl04.png"]
-            },
-            {
-                title: "Modern Warfare 3",
-                file: "MW3.jpg",
-                vimeo: "914962979",
-                category: "Game Cinematics",
-                role: "UI / HUD Designer",
-                year: "2023",
-                studio: "Activision",
-                deliverables: "Mission UI, tactical overlays, data animation",
-                description: "Crafted militarized interface design for cinematic gameplay moments with clarity-first animation systems.",
-                frames: ["assets/stills/mw3/mwthree1.png", "assets/stills/mw3/mwthree2.png", "assets/stills/mw3/mwthree3.png"]
-            },
-            {
-                title: "She Hulk",
-                file: "SHE_HULK_STILL.jpg",
-                vimeo: "914963799",
-                category: "Series",
-                role: "Motion Graphics Designer",
-                year: "2022",
-                studio: "Marvel / Disney+",
-                deliverables: "Courtroom graphics, lower thirds, transitions",
-                description: "Developed courtroom-style informational graphics and lower thirds to support tone and legal-comedy pacing.",
-                frames: ["assets/stills/shehulk/she1.png", "assets/stills/shehulk/she2.png", "assets/stills/shehulk/she3.png"]
-            },
-            {
-                title: "Skeleton Crew",
-                file: "SKELCREW.png",
-                vimeo: "1141019603",
-                category: "Series",
-                role: "Lead Motion Designer",
-                year: "2024",
-                studio: "Lucasfilm",
-                deliverables: "Textured motion language, episodic graphics",
-                description: "Led motion design direction focused on tactile textures, distressed typography, and world-consistent interface graphics.",
-                frames: ["assets/stills/skelatoncrew/skel_01.png", "assets/stills/skelatoncrew/skel_02.png", "assets/stills/skelatoncrew/skel_03.png"]
-            },
-            {
-                title: "Now You See Me 2",
-                file: "NYSM2.png",
-                vimeo: "913927393",
-                category: "Feature Film",
-                role: "VFX Artist",
-                year: "2016",
-                studio: "Lionsgate",
-                deliverables: "Card trails, reveal composites",
-                description: "Designed and composited stylized card-throwing visuals with precision-timed FX for major illusion beats.",
-                frames: ["assets/stills/nysm2/NYSM01.png", "assets/stills/nysm2/NYSM02.png", "assets/stills/nysm2/NYSM03.png"]
-            },
-            {
-                title: "Jessica Jones",
-                file: "JESSICAJONES.png",
-                vimeo: "914963591",
-                category: "Main Title",
-                role: "Title Designer",
-                year: "2015",
-                studio: "Marvel / Netflix",
-                deliverables: "Title sequence, painterly motion system",
-                description: "Created a noir comic-inspired title sequence blending watercolor textures with moody, investigative pacing.",
-                frames: ["assets/stills/jessicajones/jj01.png", "assets/stills/jessicajones/jj02.png", "assets/stills/jessicajones/jj03.png"]
-            },
-            {
-                title: "Kung Fu Panda",
-                file: "KFP.jpg",
-                vimeo: "914963679",
-                category: "Animated Promo",
-                role: "Motion Designer",
-                year: "2016",
-                studio: "DreamWorks",
-                deliverables: "Broadcast package, energetic transitions",
-                description: "Developed a playful, high-tempo promo package with character-aligned timing and expressive graphic transitions.",
-                frames: []
-            },
-            {
-                title: "Rampage",
-                file: "RAMPAGEOPEN.jpg",
-                vimeo: "914970552",
-                category: "Main Title",
-                role: "Title Designer",
-                year: "2018",
-                studio: "Warner Bros.",
-                deliverables: "Opening title sequence, mutation motifs",
-                description: "Designed a mutation-driven title sequence using biological forms, data overlays, and aggressive scale transitions.",
-                frames: ["assets/stills/rampage/rmpg1.png", "assets/stills/rampage/rmpg2.png", "assets/stills/rampage/rmpg3.png"]
-            }
-        ];
+    document.getElementById('unlock').addEventListener('click', unlockEditor);
 
-        let projects = applyProjectOverrides(baseProjects, projectContentOverrides);
+    if (sessionStorage.getItem('editorUnlocked') === '1') {
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+      if (preview.contentWindow?.document?.readyState === 'complete') hydrateFromPreview();
+    }
 
-        const galleryContainer = document.getElementById('gallery-grid');
+    document.getElementById('copyConfig').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(document.getElementById('output').textContent);
+      alert('Copied config. Paste both constants into index.html.');
+    });
 
-        // 5. GENERATE GRID
-        function renderGallery() {
-            galleryContainer.innerHTML = '';
-
-            projects.forEach((proj) => {
-                const card = document.createElement('div');
-                card.className = 'project-card';
-
-                const imagePath = proj.file.includes('/') ? proj.file : `assets/thumbs/${proj.file}`;
-
-                card.innerHTML = `
-                    <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
-                    <div class="card-overlay">
-                        <div class="card-title">${proj.title}</div>
-                        <div class="card-action">View Project</div>
-                        <div class="card-meta">${proj.category} • ${proj.role}</div>
-                    </div>
-                `;
-
-                card.addEventListener('click', () => openModal(proj));
-                galleryContainer.appendChild(card);
-            });
-        }
-
-        renderGallery();
-        projects.forEach((proj, index) => {
-            const card = document.createElement('div');
-            card.className = 'project-card';
-            
-            let imagePath;
-            if (proj.file.includes('/')) {
-                imagePath = proj.file;
-            } else {
-                imagePath = `assets/thumbs/${proj.file}`;
-            }
-            
-            card.innerHTML = `
-                <img src="${imagePath}" alt="${proj.title}" onerror="this.style.display='none'">
-                <div class="card-overlay">
-                    <div class="card-title">${proj.title}</div>
-                    <div class="card-action">View Project</div>
-                    <div class="card-meta">${proj.category} • ${proj.role}</div>
-                </div>
-            `;
-            card.addEventListener('click', () => openModal(proj));
-            galleryContainer.appendChild(card);
-        });
-
-        // 6. LOAD ANIMATION
-        window.addEventListener('load', () => { document.getElementById('hero-content').classList.add('visible'); });
-
-        // 7. PLAYER LOGIC
-        const floatPlayer = document.getElementById('floatingPlayer');
-        const floatFrame = document.getElementById('floatFrame');
-        
-        function openFloatingReel(vimeoId) {
-            closeModal();
-            floatFrame.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0&color=ffffff`;
-            floatPlayer.style.display = 'block';
-        }
-        function closeFloatingReel() { floatPlayer.style.display = 'none'; floatFrame.src = ""; }
-
-        const modal = document.getElementById('videoModal');
-        const videoContainer = document.getElementById('videoContainer');
-        const titleLabel = document.getElementById('modalTitle');
-        const descLabel = document.getElementById('modalDesc');
-        const metaLabel = document.getElementById('modalMeta');
-        const framesGrid = document.getElementById('framesGrid');
-
-        function openModal(project) {
-            closeFloatingReel();
-            
-            // Generate Video Player(s)
-            videoContainer.innerHTML = ''; // Clear old videos
-            
-            // Check if vimeo ID is an array or string
-            const videos = Array.isArray(project.vimeo) ? project.vimeo : [project.vimeo];
-            
-            videos.forEach((vidId, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'video-wrapper';
-                // Only autoplay the first video
-                const autoPlay = index === 0 ? 1 : 0;
-                wrapper.innerHTML = `<iframe src="https://player.vimeo.com/video/${vidId}?autoplay=${autoPlay}&title=0&byline=0&portrait=0&color=ffffff" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                videoContainer.appendChild(wrapper);
-            });
-
-            titleLabel.innerText = project.title;
-            descLabel.innerText = project.description;
-            metaLabel.innerHTML = `<div>${project.role} • ${project.category}</div><div>${project.year} • ${project.studio}</div><div>${project.deliverables}</div>`;
-
-            framesGrid.innerHTML = ''; 
-            if(project.frames && project.frames.length > 0) {
-                project.frames.forEach(framePath => {
-                    const img = document.createElement('img');
-                    img.className = 'style-frame';
-                    img.src = framePath; 
-                    // ADDED CLICK EVENT TO OPEN LIGHTBOX
-                    img.addEventListener('click', () => openLightbox(framePath));
-                    framesGrid.appendChild(img);
-                });
-            }
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() { 
-            modal.classList.remove('open'); 
-            videoContainer.innerHTML = ''; // Stop video playback
-            document.body.style.overflow = 'auto'; 
-        }
-        modal.addEventListener('click', (e) => { 
-            if (e.target === modal || e.target.classList.contains('modal-container')) closeModal(); 
-        });
-
-        // 8. LIGHTBOX LOGIC
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-
-        function openLightbox(src) {
-            lightboxImg.src = src;
-            lightbox.classList.add('visible');
-        }
-
-        function closeLightbox() {
-            lightbox.classList.remove('visible');
-            setTimeout(() => { lightboxImg.src = ""; }, 300); // Clear after fade out
-        }
-    </script>
+    document.getElementById('reloadDefaults').addEventListener('click', () => {
+      preview.src = 'index.html';
+      preview.addEventListener('load', hydrateFromPreview, { once: true });
+    });
+  </script>
 </body>
 </html>
