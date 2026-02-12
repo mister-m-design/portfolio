@@ -54,6 +54,7 @@
         <button id="saveBtn" class="primary">Save edits</button>
         <button id="resetBtn">Reset defaults</button>
         <button id="openSiteBtn">Open site</button>
+        <span id="saveStatus" class="muted" style="align-self:center;">Ready</span>
       </div>
 
       <div class="section">
@@ -78,6 +79,10 @@
     const app = document.getElementById('app');
     const keyInput = document.getElementById('key');
     const preview = document.getElementById('preview');
+    const saveStatus = document.getElementById('saveStatus');
+    const editorChannel = typeof BroadcastChannel !== 'undefined'
+      ? new BroadcastChannel('mrm_editor_channel')
+      : null;
 
     const defaultSiteContent = {
       brandName: { text: 'Michael Rush Murtha', size: 1.1 },
@@ -135,6 +140,18 @@
         siteContent: state.siteContent,
         projectOverrides: state.projectContent
       }));
+      if (saveStatus) saveStatus.textContent = 'Saved';
+    }
+
+    function broadcastState() {
+      if (!editorChannel) return;
+      editorChannel.postMessage({
+        type: 'editor-state-update',
+        payload: {
+          siteContent: state.siteContent,
+          projectOverrides: state.projectContent
+        }
+      });
     }
 
     function postPreviewUpdate() {
@@ -163,9 +180,11 @@
       input.value = value.text;
       input.addEventListener('input', () => {
         state.siteContent[id].text = input.value;
+        if (saveStatus) saveStatus.textContent = 'Saving…';
         renderOutput();
         saveState();
         postPreviewUpdate();
+        broadcastState();
       });
 
       const row = document.createElement('div');
@@ -182,10 +201,12 @@
 
       range.addEventListener('input', () => {
         state.siteContent[id].size = Number(range.value);
+        if (saveStatus) saveStatus.textContent = 'Saving…';
         pill.textContent = `${Number(range.value).toFixed(2).replace(/\.00$/, '')}rem`;
         renderOutput();
         saveState();
         postPreviewUpdate();
+        broadcastState();
       });
 
       row.appendChild(range);
@@ -210,9 +231,11 @@
         input.value = value[fieldKey] || '';
         input.addEventListener('input', () => {
           state.projectContent[projectKey][fieldKey] = input.value;
+          if (saveStatus) saveStatus.textContent = 'Saving…';
           renderOutput();
           saveState();
           postPreviewUpdate();
+          broadcastState();
         });
 
         box.appendChild(label);
@@ -239,6 +262,7 @@
       renderOutput();
       saveState();
       postPreviewUpdate();
+      broadcastState();
     }
 
     function unlockEditor() {
@@ -251,6 +275,7 @@
       gate.classList.add('hidden');
       app.classList.remove('hidden');
       renderForms();
+      broadcastState();
     }
 
     document.getElementById('unlock').addEventListener('click', unlockEditor);
@@ -263,9 +288,11 @@
     }
 
     document.getElementById('saveBtn').addEventListener('click', () => {
+      if (saveStatus) saveStatus.textContent = 'Saving…';
       saveState();
       postPreviewUpdate();
-      alert('Edits saved and applied in this browser.');
+      broadcastState();
+      alert('Saved and pushed live to open site tabs in this browser.');
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
