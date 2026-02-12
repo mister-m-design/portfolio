@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private CMS Editor</title>
+  <style>
+    :root {
+      --bg: #0b0c11;
+      --panel: #141823;
+      --border: #2f3649;
+      --text: #ecf0ff;
+      --muted: #9ea7be;
+      --accent: #95a1ff;
+      --ok: #84f0b4;
+      --warn: #ffd08a;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .hidden { display: none !important; }
+
+    .gate {
+      max-width: 420px;
+      margin: 14vh auto;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 1rem;
+    }
+
+    .editor-shell { min-height: 100vh; position: relative; }
+    iframe { width: 100vw; height: 100vh; border: 0; display: block; background: #030303; }
+
+    .floating {
+      position: fixed;
+      z-index: 60;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 35, 0.96);
+      backdrop-filter: blur(6px);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+
+    .floating-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      cursor: move;
+      background: rgba(13, 17, 28, 0.9);
+    }
+
+    .floating-header h2 {
+      margin: 0;
+      font-size: 0.92rem;
+      user-select: none;
+    }
+
+    .floating-actions { display: flex; gap: 0.35rem; }
+
+    .floating-body { padding: 0.65rem; }
+
+    .dock {
+      top: 12px;
+      left: 12px;
+      width: min(92vw, 560px);
+    }
+
+    .inspector {
+      top: 12px;
+      right: 12px;
+      width: min(92vw, 380px);
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+    }
+
+    .row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.55rem; align-items: center; }
+    button {
+      border: 1px solid var(--border);
+      background: #10131d;
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0.45rem 0.65rem;
+    }
+    button.primary { background: var(--accent); color: #111; border-color: transparent; font-weight: 700; }
+    button.ghost { padding: 0.25rem 0.5rem; }
+
+    .status { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .muted { color: var(--muted); font-size: 0.82rem; margin: 0.35rem 0 0; }
+
+    .label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0c0f17;
+      color: var(--text);
+      padding: 0.5rem 0.55rem;
+    }
+
+    textarea { min-height: 68px; resize: vertical; }
+    input[type='range'] { accent-color: var(--accent); }
+
+    .hint {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      z-index: 40;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 35, 0.93);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      max-width: min(92vw, 620px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .show-controls { display: flex; gap: 0.45rem; }
+  </style>
+</head>
+<body>
+  <section id="gate" class="gate">
+    <h1>Private CMS editor</h1>
+    <p class="muted">This page is private. Unlock to edit content directly on the live preview.</p>
+    <label class="label" for="key">Editor key</label>
+    <input id="key" type="password" />
+    <div class="row"><button id="unlockBtn" class="primary">Unlock editor</button></div>
+  </section>
+
+  <main id="app" class="editor-shell hidden">
+    <iframe id="preview" src="index.html"></iframe>
+
+    <section id="dock" class="floating dock">
+      <div id="dockHeader" class="floating-header">
+        <h2>Live CMS</h2>
+        <div class="floating-actions">
+          <button id="toggleDockBtn" class="ghost" type="button">Hide</button>
+        </div>
+      </div>
+      <div class="floating-body">
+        <p class="muted">Edit highlighted text in preview. Click a work card to edit video/media data instead of opening it.</p>
+        <p id="editorVersion" class="muted" style="margin-top:0.25rem;"></p>
+        <div class="row">
+          <button id="saveBtn" class="primary">Save state</button>
+          <button id="applyBtn">Apply to index.html</button>
+          <button id="downloadBtn">Download index.html</button>
+          <button id="addProjectBtn">Add project</button>
+          <button id="resetBtn">Reset</button>
+          <button id="toggleProjectEditBtn">Card edit mode: On</button>
+          <span id="status" class="status">Ready</span>
+        </div>
+      </div>
+    </section>
+
+    <aside id="inspector" class="floating inspector hidden">
+      <div id="inspectorHeader" class="floating-header">
+        <h2 id="inspectorTitle">Inspector</h2>
+        <div class="floating-actions">
+          <button id="toggleInspectorBtn" class="ghost" type="button">Hide</button>
+        </div>
+      </div>
+      <div class="floating-body">
+        <div id="siteInspector" class="hidden">
+          <label class="label">Text</label>
+          <textarea id="siteText"></textarea>
+          <label class="label">Font size (<span id="siteSizeLabel">1rem</span>)</label>
+          <input id="siteSize" type="range" min="0.55" max="8" step="0.05" />
+        </div>
+
+        <div id="projectInspector" class="hidden">
+          <label class="label">Title</label><input id="pTitle" />
+          <label class="label">Category</label><input id="pCategory" />
+          <label class="label">Role</label><input id="pRole" />
+          <label class="label">Year</label><input id="pYear" />
+          <label class="label">Studio</label><input id="pStudio" />
+          <label class="label">Deliverables</label><input id="pDeliverables" />
+          <label class="label">Description</label><textarea id="pDescription"></textarea>
+          <label class="label">Thumbnail image path</label><input id="pFile" placeholder="assets/thumbs/example.png" />
+          <label class="label">Vimeo id/url (comma separated)</label><input id="pVimeo" />
+          <label class="label">Style frame image paths (comma separated)</label><textarea id="pFrames"></textarea>
+          <label class="label">Order</label><input id="pOrder" type="number" />
+          <div class="row">
+            <button id="moveUpBtn" type="button">Move up</button>
+            <button id="moveDownBtn" type="button">Move down</button>
+            <button id="deleteBtn" type="button">Delete</button>
+            <button id="restoreBtn" type="button" class="hidden">Restore</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="hint">
+      <span>Tip: yellow outline = editable text. cyan outline = editable project card.</span>
+      <div class="show-controls">
+        <button id="showDockBtn" class="ghost hidden" type="button">Show CMS</button>
+        <button id="showInspectorBtn" class="ghost hidden" type="button">Show Inspector</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const EDITOR_KEY = 'mrm-private-editor';
+    const CMS_EDITOR_VERSION = 'v2.2.0';
+    const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
+    const CHANNEL_NAME = 'mrm_editor_channel';
+    const INDEX_URL = new URL('index.html', window.location.href).toString();
+    const SITE_EDIT_IDS = [
+      'brandName','heroKicker','heroTitle','heroDescription','heroCta','heroStat1Value','heroStat1Label',
+      'heroStat2Value','heroStat2Label','heroStat3Value','heroStat3Label','workHeading','workSubheading',
+      'framesHeader','footerEmail','copyrightText'
+    ];
+
+    const gate = document.getElementById('gate');
+    const app = document.getElementById('app');
+    const preview = document.getElementById('preview');
+    const keyInput = document.getElementById('key');
+    const statusEl = document.getElementById('status');
+    const dock = document.getElementById('dock');
+    const inspector = document.getElementById('inspector');
+    const siteInspector = document.getElementById('siteInspector');
+    const projectInspector = document.getElementById('projectInspector');
+    const inspectorTitle = document.getElementById('inspectorTitle');
+    const editorChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
+
+    let state = { siteContent: {}, projectOverrides: {} };
+    let selectedSiteId = null;
+    let selectedProjectKey = null;
+    let projectEditMode = true;
+
+    function safeParse(raw, fallback) {
+      try { return JSON.parse(raw); } catch { return fallback; }
+    }
+
+    function clone(v) { return JSON.parse(JSON.stringify(v)); }
+
+    function normalizeProject(project = {}, fallbackOrder = 0) {
+      return {
+        title: project.title || 'Untitled Project',
+        category: project.category || '',
+        role: project.role || '',
+        year: project.year || '',
+        studio: project.studio || '',
+        deliverables: project.deliverables || '',
+        description: project.description || '',
+        file: project.file || '',
+        vimeo: Array.isArray(project.vimeo) ? project.vimeo.join(', ') : (project.vimeo || ''),
+        frames: Array.isArray(project.frames) ? project.frames.join(', ') : (project.frames || ''),
+        order: Number.isFinite(Number(project.order)) ? Number(project.order) : fallbackOrder,
+        deleted: !!project.deleted
+      };
+    }
+
+    function makeDraggable(panel, handle) {
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let originX = 0;
+      let originY = 0;
+
+      handle.addEventListener('pointerdown', (event) => {
+        if (event.target.closest('button')) return;
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        const rect = panel.getBoundingClientRect();
+        originX = rect.left;
+        originY = rect.top;
+        panel.style.left = `${originX}px`;
+        panel.style.top = `${originY}px`;
+        panel.style.right = 'auto';
+        handle.setPointerCapture(event.pointerId);
+      });
+
+      handle.addEventListener('pointermove', (event) => {
+        if (!dragging) return;
+        const nextX = originX + (event.clientX - startX);
+        const nextY = originY + (event.clientY - startY);
+        panel.style.left = `${Math.max(0, nextX)}px`;
+        panel.style.top = `${Math.max(0, nextY)}px`;
+      });
+
+      handle.addEventListener('pointerup', (event) => {
+        dragging = false;
+        try { handle.releasePointerCapture(event.pointerId); } catch {}
+      });
+    }
+
+    function setStatus(text, cls = '') {
+      statusEl.textContent = text;
+      statusEl.className = `status ${cls}`.trim();
+    }
+
+    function setVersionUI() {
+      const versionEl = document.getElementById('editorVersion');
+      if (!versionEl) return;
+      versionEl.textContent = `Editor version: ${CMS_EDITOR_VERSION}`;
+    }
+
+    function persistState(text = 'Saved') {
+      localStorage.setItem(EDITOR_STATE_KEY, JSON.stringify(state));
+      setStatus(text, text.includes('Saved') ? 'ok' : '');
+    }
+
+    function broadcastState() {
+      if (!editorChannel) return;
+      editorChannel.postMessage({ type: 'editor-state-update', payload: clone(state) });
+    }
+
+    function postPreviewState() {
+      try {
+        preview.contentWindow.postMessage({
+          type: 'portfolio-preview-update',
+          payload: clone(state)
+        }, '*');
+      } catch {}
+    }
+
+    function syncAll(status = 'Saved') {
+      persistState(status);
+      postPreviewState();
+      broadcastState();
+      setTimeout(enableDirectEditing, 80);
+    }
+
+    function loadLocalState() {
+      const parsed = safeParse(localStorage.getItem(EDITOR_STATE_KEY) || '{}', {});
+      if (!parsed || typeof parsed !== 'object') return;
+      if (parsed.siteContent && typeof parsed.siteContent === 'object') state.siteContent = clone(parsed.siteContent);
+      if (parsed.projectOverrides && typeof parsed.projectOverrides === 'object') {
+        state.projectOverrides = Object.fromEntries(
+          Object.entries(parsed.projectOverrides).map(([k, v], i) => [k, normalizeProject(v, i)])
+        );
+      }
+    }
+
+    function extractSnapshot() {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return false;
+      const snap = snapshotFn();
+      if (!snap || !snap.siteContent) return false;
+      state.siteContent = clone(snap.siteContent);
+      state.projectOverrides = Object.fromEntries(
+        Object.entries(snap.projectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
+      );
+      return true;
+    }
+
+    function hydrateProjectFromPreview(projectKey) {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return false;
+      const snap = snapshotFn();
+      const projectMap = snap?.projectContent || {};
+      if (projectMap[projectKey]) {
+        const fallbackOrder = sortedProjectKeys().length;
+        state.projectOverrides[projectKey] = normalizeProject(projectMap[projectKey], fallbackOrder);
+        return true;
+      }
+      return false;
+    }
+
+    function ensureProjectExists(projectKey) {
+      if (state.projectOverrides[projectKey]) return true;
+      if (hydrateProjectFromPreview(projectKey)) return true;
+
+      const doc = preview.contentDocument;
+      const card = doc?.querySelector(`.project-card[data-project-key="${CSS.escape(projectKey)}"]`);
+      if (!card) return false;
+
+      const title = card.querySelector('.card-title')?.innerText?.trim() || 'Untitled Project';
+      state.projectOverrides[projectKey] = normalizeProject({
+        title,
+        order: sortedProjectKeys().length
+      }, sortedProjectKeys().length);
+      syncAll('Saved');
+      return true;
+    }
+
+    function sortedProjectKeys() {
+      return Object.entries(state.projectOverrides)
+        .sort((a, b) => Number(a[1].order || 0) - Number(b[1].order || 0))
+        .map(([k]) => k);
+    }
+
+    function moveProject(key, dir) {
+      const keys = sortedProjectKeys();
+      const i = keys.indexOf(key);
+      const next = i + dir;
+      if (i < 0 || next < 0 || next >= keys.length) return;
+      [keys[i], keys[next]] = [keys[next], keys[i]];
+      keys.forEach((k, idx) => {
+        if (state.projectOverrides[k]) state.projectOverrides[k].order = idx;
+      });
+      syncAll('Saved');
+      openProjectInspector(key);
+    }
+
+    function showInspector(mode) {
+      inspector.classList.remove('hidden');
+      document.getElementById('showInspectorBtn').classList.add('hidden');
+      siteInspector.classList.add('hidden');
+      projectInspector.classList.add('hidden');
+      if (mode === 'site') siteInspector.classList.remove('hidden');
+      if (mode === 'project') projectInspector.classList.remove('hidden');
+    }
+
+    function openSiteInspector(id) {
+      const value = state.siteContent[id];
+      if (!value) return;
+      selectedSiteId = id;
+      selectedProjectKey = null;
+      showInspector('site');
+      inspectorTitle.textContent = `Editing text: ${id}`;
+      document.getElementById('siteText').value = value.text || '';
+      const size = Number(value.size || 1);
+      const range = document.getElementById('siteSize');
+      range.value = String(size);
+      document.getElementById('siteSizeLabel').textContent = `${size}rem`;
+    }
+
+    function openProjectInspector(projectKey) {
+      if (!ensureProjectExists(projectKey)) return;
+      const value = state.projectOverrides[projectKey];
+      if (!value) return;
+      selectedProjectKey = projectKey;
+      selectedSiteId = null;
+      showInspector('project');
+      inspectorTitle.textContent = `Editing work item: ${projectKey}`;
+      document.getElementById('pTitle').value = value.title || '';
+      document.getElementById('pCategory').value = value.category || '';
+      document.getElementById('pRole').value = value.role || '';
+      document.getElementById('pYear').value = value.year || '';
+      document.getElementById('pStudio').value = value.studio || '';
+      document.getElementById('pDeliverables').value = value.deliverables || '';
+      document.getElementById('pDescription').value = value.description || '';
+      document.getElementById('pFile').value = value.file || '';
+      document.getElementById('pVimeo').value = value.vimeo || '';
+      document.getElementById('pFrames').value = value.frames || '';
+      document.getElementById('pOrder').value = String(Number(value.order || 0));
+      document.getElementById('deleteBtn').classList.toggle('hidden', value.deleted);
+      document.getElementById('restoreBtn').classList.toggle('hidden', !value.deleted);
+    }
+
+    function applyCardEditModeStyles(doc) {
+      let style = doc.getElementById('cmsCardEditModeStyle');
+      if (!projectEditMode) {
+        if (style) style.remove();
+        doc.documentElement.removeAttribute('data-cms-card-edit');
+        return;
+      }
+
+      doc.documentElement.setAttribute('data-cms-card-edit', 'on');
+
+      if (!style) {
+        style = doc.createElement('style');
+        style.id = 'cmsCardEditModeStyle';
+        doc.head.appendChild(style);
+      }
+
+      style.textContent = `
+        [data-cms-card-edit='on'] .project-card {
+          outline: 2px solid rgba(93, 245, 255, 0.82) !important;
+          outline-offset: -2px !important;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+          cursor: pointer !important;
+        }
+        [data-cms-card-edit='on'] .project-card > * {
+          pointer-events: none !important;
+        }
+        [data-cms-card-edit='on'] .project-card .cms-card-edit-badge {
+          pointer-events: auto !important;
+          display: inline-flex !important;
+        }
+        [data-cms-card-edit='on'] .project-card img,
+        [data-cms-card-edit='on'] .project-card .card-overlay,
+        [data-cms-card-edit='on'] .project-card .card-title,
+        [data-cms-card-edit='on'] .project-card .card-action,
+        [data-cms-card-edit='on'] .project-card .card-meta {
+          transition: none !important;
+          transform: none !important;
+        }
+        [data-cms-card-edit='on'] .project-card:hover img {
+          transform: none !important;
+          opacity: 1 !important;
+        }
+        [data-cms-card-edit='on'] .project-card:hover .card-overlay {
+          opacity: 1 !important;
+        }
+      `;
+    }
+
+    function enableDirectEditing() {
+      const doc = preview.contentDocument;
+      if (!doc) return;
+      applyCardEditModeStyles(doc);
+
+      if (!doc.body.dataset.cmsCardCaptureBound) {
+        doc.addEventListener('click', (event) => {
+          const target = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
+          const card = target?.closest?.('.project-card');
+          if (!card || !projectEditMode) return;
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+          const key = card.dataset.projectKey;
+          if (key) openProjectInspector(key);
+        }, true);
+        doc.body.dataset.cmsCardCaptureBound = '1';
+      }
+
+      SITE_EDIT_IDS.forEach((id) => {
+        const el = doc.getElementById(id);
+        if (!el || !state.siteContent[id]) return;
+        el.contentEditable = 'true';
+        el.style.outline = '1px dashed rgba(255, 214, 107, 0.7)';
+        el.style.outlineOffset = '2px';
+        if (!el.dataset.cmsBound) {
+          el.addEventListener('focus', () => openSiteInspector(id));
+          el.addEventListener('click', () => openSiteInspector(id));
+          el.addEventListener('input', () => {
+            state.siteContent[id].text = el.innerHTML;
+            syncAll('Saving…');
+          });
+          el.dataset.cmsBound = '1';
+        }
+      });
+
+      doc.querySelectorAll('.project-card').forEach((card) => {
+        const key = card.dataset.projectKey;
+        if (!key) return;
+
+        if (!card.querySelector('.cms-card-edit-badge')) {
+          const badge = doc.createElement('button');
+          badge.className = 'cms-card-edit-badge';
+          badge.type = 'button';
+          badge.textContent = 'Edit card';
+          badge.style.position = 'absolute';
+          badge.style.top = '10px';
+          badge.style.right = '10px';
+          badge.style.zIndex = '20';
+          badge.style.fontSize = '11px';
+          badge.style.padding = '5px 8px';
+          badge.style.borderRadius = '999px';
+          badge.style.border = '1px solid rgba(93, 245, 255, 0.75)';
+          badge.style.background = 'rgba(5, 14, 19, 0.82)';
+          badge.style.color = '#cff9ff';
+          badge.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            openProjectInspector(key);
+          }, true);
+          card.appendChild(badge);
+        }
+
+        const badge = card.querySelector('.cms-card-edit-badge');
+        if (badge) {
+          badge.style.display = projectEditMode ? 'inline-flex' : 'none';
+        }
+
+        const title = card.querySelector('.card-title');
+        if (title && state.projectOverrides[key]) {
+          title.contentEditable = 'true';
+          if (!title.dataset.cmsBound) {
+            title.addEventListener('focus', () => openProjectInspector(key));
+            title.addEventListener('input', () => {
+              state.projectOverrides[key].title = title.innerText.trim();
+              syncAll('Saving…');
+            });
+            title.dataset.cmsBound = '1';
+          }
+        }
+      });
+    }
+
+    function wireInspectorInputs() {
+      document.getElementById('siteText').addEventListener('input', (e) => {
+        if (!selectedSiteId || !state.siteContent[selectedSiteId]) return;
+        state.siteContent[selectedSiteId].text = e.target.value;
+        syncAll('Saving…');
+      });
+
+      document.getElementById('siteSize').addEventListener('input', (e) => {
+        if (!selectedSiteId || !state.siteContent[selectedSiteId]) return;
+        const size = Number(e.target.value);
+        state.siteContent[selectedSiteId].size = size;
+        document.getElementById('siteSizeLabel').textContent = `${size}rem`;
+        syncAll('Saving…');
+      });
+
+      const mapping = {
+        pTitle: 'title', pCategory: 'category', pRole: 'role', pYear: 'year', pStudio: 'studio',
+        pDeliverables: 'deliverables', pDescription: 'description', pFile: 'file', pVimeo: 'vimeo',
+        pFrames: 'frames', pOrder: 'order'
+      };
+
+      Object.entries(mapping).forEach(([id, key]) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+          state.projectOverrides[selectedProjectKey][key] = key === 'order' ? Number(e.target.value || 0) : e.target.value;
+          syncAll('Saving…');
+        });
+      });
+
+      document.getElementById('moveUpBtn').addEventListener('click', () => {
+        if (selectedProjectKey) moveProject(selectedProjectKey, -1);
+      });
+      document.getElementById('moveDownBtn').addEventListener('click', () => {
+        if (selectedProjectKey) moveProject(selectedProjectKey, 1);
+      });
+      document.getElementById('deleteBtn').addEventListener('click', () => {
+        if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+        state.projectOverrides[selectedProjectKey].deleted = true;
+        syncAll('Saved');
+        openProjectInspector(selectedProjectKey);
+      });
+      document.getElementById('restoreBtn').addEventListener('click', () => {
+        if (!selectedProjectKey || !state.projectOverrides[selectedProjectKey]) return;
+        state.projectOverrides[selectedProjectKey].deleted = false;
+        syncAll('Saved');
+        openProjectInspector(selectedProjectKey);
+      });
+    }
+
+    function buildUpdatedIndexHtml(sourceHtml) {
+      const nextSite = `let siteContent = ${JSON.stringify(state.siteContent, null, 2)};`;
+      const nextProjects = `let projectContentOverrides = ${JSON.stringify(state.projectOverrides, null, 2)};`;
+      let updated = sourceHtml.replace(/let\s+siteContent\s*=\s*\{[\s\S]*?\};/, nextSite);
+      updated = updated.replace(/let\s+projectContentOverrides\s*=\s*\{[\s\S]*?\};/, nextProjects);
+      return updated;
+    }
+
+    async function fetchCurrentIndexHtml() {
+      const res = await fetch(INDEX_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Could not load index.html');
+      return res.text();
+    }
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function setupPanelControls() {
+      makeDraggable(dock, document.getElementById('dockHeader'));
+      makeDraggable(inspector, document.getElementById('inspectorHeader'));
+
+      document.getElementById('toggleDockBtn').addEventListener('click', () => {
+        dock.classList.add('hidden');
+        document.getElementById('showDockBtn').classList.remove('hidden');
+      });
+
+      document.getElementById('showDockBtn').addEventListener('click', () => {
+        dock.classList.remove('hidden');
+        document.getElementById('showDockBtn').classList.add('hidden');
+      });
+
+      document.getElementById('toggleInspectorBtn').addEventListener('click', () => {
+        inspector.classList.add('hidden');
+        document.getElementById('showInspectorBtn').classList.remove('hidden');
+      });
+
+      document.getElementById('showInspectorBtn').addEventListener('click', () => {
+        inspector.classList.remove('hidden');
+        document.getElementById('showInspectorBtn').classList.add('hidden');
+      });
+
+      document.getElementById('toggleProjectEditBtn').addEventListener('click', (event) => {
+        projectEditMode = !projectEditMode;
+        event.target.textContent = `Card edit mode: ${projectEditMode ? 'On' : 'Off'}`;
+        setStatus(projectEditMode ? 'Card edit mode enabled' : 'Card edit mode disabled', 'warn');
+        enableDirectEditing();
+      });
+    }
+
+    function unlockEditor() {
+      if (keyInput.value !== EDITOR_KEY) {
+        alert('Incorrect key.');
+        return;
+      }
+      sessionStorage.setItem('editorUnlocked', '1');
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      setStatus('Loading preview…', 'warn');
+    }
+
+    document.getElementById('unlockBtn').addEventListener('click', unlockEditor);
+
+    if (sessionStorage.getItem('editorUnlocked') === '1') {
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      setStatus('Loading preview…', 'warn');
+    }
+
+    preview.src = INDEX_URL;
+    preview.addEventListener('load', () => {
+      const hydrated = extractSnapshot();
+      if (!hydrated) loadLocalState();
+      syncAll('Saved');
+      enableDirectEditing();
+      setStatus(hydrated ? 'Preview connected' : 'Loaded local state', hydrated ? 'ok' : 'warn');
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      syncAll('Saved');
+      alert('Saved. Edits are live in preview and stored in your browser.');
+    });
+
+    document.getElementById('addProjectBtn').addEventListener('click', () => {
+      const key = `custom:${Date.now()}`;
+      state.projectOverrides[key] = normalizeProject({ title: 'New Project', order: sortedProjectKeys().length }, sortedProjectKeys().length);
+      syncAll('Saved');
+      openProjectInspector(key);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset all editor changes back to default?')) return;
+      localStorage.removeItem(EDITOR_STATE_KEY);
+      location.reload();
+    });
+
+    document.getElementById('applyBtn').addEventListener('click', async () => {
+      if (!window.showOpenFilePicker) {
+        alert('Direct Apply is not supported here. Use Download index.html.');
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'HTML Files', accept: { 'text/html': ['.html'] } }],
+          multiple: false
+        });
+        const file = await handle.getFile();
+        const updated = buildUpdatedIndexHtml(await file.text());
+        const writable = await handle.createWritable();
+        await writable.write(updated);
+        await writable.close();
+        setStatus('Applied to file', 'ok');
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          setStatus('Apply failed', 'warn');
+          alert(`Apply failed: ${error.message}`);
+        }
+      }
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+      try {
+        const updated = buildUpdatedIndexHtml(await fetchCurrentIndexHtml());
+        downloadTextFile('index.html', updated);
+        setStatus('Downloaded index.html', 'ok');
+      } catch (error) {
+        setStatus('Download failed', 'warn');
+        alert(`Download failed: ${error.message}`);
+      }
+    });
+
+    setVersionUI();
+    setupPanelControls();
+    wireInspectorInputs();
+  </script>
+</body>
+</html>
