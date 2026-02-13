@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor A</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -205,6 +205,7 @@
           <label class="label">Year</label><input id="pYear" />
           <label class="label">Studio</label><input id="pStudio" />
           <label class="label">Deliverables</label><input id="pDeliverables" />
+          <label class="label">Tools used</label><input id="pTools" placeholder="After Effects, Houdini, Nuke" />
           <label class="label">Description</label><textarea id="pDescription"></textarea>
           <label class="label">Thumbnail image path</label><input id="pFile" placeholder="assets/thumbs/example.png" />
           <label class="label">Vimeo id/url (comma separated)</label><input id="pVimeo" />
@@ -231,7 +232,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.3.5';
+    const CMS_EDITOR_VERSION = 'v2.3.7';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -275,6 +276,7 @@
         year: project.year || '',
         studio: project.studio || '',
         deliverables: project.deliverables || '',
+        tools: project.tools || '',
         description: project.description || '',
         file: project.file || '',
         vimeo: Array.isArray(project.vimeo) ? project.vimeo.join(', ') : (project.vimeo || ''),
@@ -338,18 +340,19 @@
       return true;
     }
 
-    function fillMissingMediaFields(project = {}, fallback = {}) {
+    function fillMissingProjectFields(project = {}, fallback = {}) {
       const next = { ...project };
       if (!next.file && fallback.file) next.file = fallback.file;
       if (!next.vimeo && fallback.vimeo) next.vimeo = fallback.vimeo;
       if (!next.frames && fallback.frames) next.frames = fallback.frames;
+      if (!next.tools && fallback.tools) next.tools = fallback.tools;
       return next;
     }
 
     function reconcileProjectMediaFromBase() {
       Object.entries(state.projectOverrides).forEach(([key, value]) => {
         const fallback = getBaseProjectForKey(key) || {};
-        state.projectOverrides[key] = normalizeProject(fillMissingMediaFields(value, fallback), Number(value.order || 0));
+        state.projectOverrides[key] = normalizeProject(fillMissingProjectFields(value, fallback), Number(value.order || 0));
       });
     }
 
@@ -476,7 +479,7 @@
       if (projectMap[projectKey]) {
         const fallbackOrder = sortedProjectKeys().length;
         const fallback = getBaseProjectForKey(projectKey) || {};
-        state.projectOverrides[projectKey] = normalizeProject(fillMissingMediaFields(projectMap[projectKey], fallback), fallbackOrder);
+        state.projectOverrides[projectKey] = normalizeProject(fillMissingProjectFields(projectMap[projectKey], fallback), fallbackOrder);
         return true;
       }
       return false;
@@ -618,7 +621,7 @@
       projectKey = normalizeStateProjectKey(projectKey);
 
       const fallback = getBaseProjectForKey(projectKey) || {};
-      const hydrated = normalizeProject(fillMissingMediaFields(state.projectOverrides[projectKey] || {}, fallback), Number(state.projectOverrides[projectKey]?.order || 0));
+      const hydrated = normalizeProject(fillMissingProjectFields(state.projectOverrides[projectKey] || {}, fallback), Number(state.projectOverrides[projectKey]?.order || 0));
       state.projectOverrides[projectKey] = hydrated;
 
       selectedProjectKey = projectKey;
@@ -631,6 +634,7 @@
       document.getElementById('pYear').value = hydrated.year || '';
       document.getElementById('pStudio').value = hydrated.studio || '';
       document.getElementById('pDeliverables').value = hydrated.deliverables || '';
+      document.getElementById('pTools').value = hydrated.tools || '';
       document.getElementById('pDescription').value = hydrated.description || '';
       document.getElementById('pFile').value = hydrated.file || '';
       document.getElementById('pVimeo').value = hydrated.vimeo || '';
@@ -896,7 +900,7 @@
 
       const mapping = {
         pTitle: 'title', pCategory: 'category', pRole: 'role', pYear: 'year', pStudio: 'studio',
-        pDeliverables: 'deliverables', pDescription: 'description', pFile: 'file', pVimeo: 'vimeo',
+        pDeliverables: 'deliverables', pTools: 'tools', pDescription: 'description', pFile: 'file', pVimeo: 'vimeo',
         pFrames: 'frames', pOrder: 'order'
       };
 
