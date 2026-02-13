@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor5</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -231,7 +231,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.3.3';
+    const CMS_EDITOR_VERSION = 'v2.3.4';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -284,6 +284,23 @@
       };
     }
 
+    function basename(pathValue) {
+      if (typeof pathValue !== 'string') return '';
+      const clean = pathValue.trim();
+      if (!clean) return '';
+      const parts = clean.split('/').filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : clean;
+    }
+
+    function getBaseProjectForKey(key) {
+      if (!key || typeof key !== 'string') return null;
+      if (baseProjectContent[key]) return baseProjectContent[key];
+      const keyBase = basename(key).toLowerCase();
+      if (!keyBase) return null;
+      const match = Object.entries(baseProjectContent).find(([projectKey]) => basename(projectKey).toLowerCase() == keyBase);
+      return match ? match[1] : null;
+    }
+
     function fillMissingMediaFields(project = {}, fallback = {}) {
       const next = { ...project };
       if (!next.file && fallback.file) next.file = fallback.file;
@@ -294,7 +311,7 @@
 
     function reconcileProjectMediaFromBase() {
       Object.entries(state.projectOverrides).forEach(([key, value]) => {
-        const fallback = baseProjectContent[key] || {};
+        const fallback = getBaseProjectForKey(key) || {};
         state.projectOverrides[key] = normalizeProject(fillMissingMediaFields(value, fallback), Number(value.order || 0));
       });
     }
@@ -423,7 +440,7 @@
       const projectMap = snap?.projectContent || {};
       if (projectMap[projectKey]) {
         const fallbackOrder = sortedProjectKeys().length;
-        const fallback = baseProjectContent[projectKey] || {};
+        const fallback = getBaseProjectForKey(projectKey) || {};
         state.projectOverrides[projectKey] = normalizeProject(fillMissingMediaFields(projectMap[projectKey], fallback), fallbackOrder);
         return true;
       }
