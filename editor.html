@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor 2</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -231,7 +231,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.3.2';
+    const CMS_EDITOR_VERSION = 'v2.3.3';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -254,6 +254,7 @@
     const editorChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
 
     let state = { siteContent: {}, projectOverrides: {} };
+    let baseProjectContent = {};
     let selectedSiteId = null;
     let selectedProjectKey = null;
     let projectEditMode = true;
@@ -281,6 +282,21 @@
         order: Number.isFinite(Number(project.order)) ? Number(project.order) : fallbackOrder,
         deleted: !!project.deleted
       };
+    }
+
+    function fillMissingMediaFields(project = {}, fallback = {}) {
+      const next = { ...project };
+      if (!next.file && fallback.file) next.file = fallback.file;
+      if (!next.vimeo && fallback.vimeo) next.vimeo = fallback.vimeo;
+      if (!next.frames && fallback.frames) next.frames = fallback.frames;
+      return next;
+    }
+
+    function reconcileProjectMediaFromBase() {
+      Object.entries(state.projectOverrides).forEach(([key, value]) => {
+        const fallback = baseProjectContent[key] || {};
+        state.projectOverrides[key] = normalizeProject(fillMissingMediaFields(value, fallback), Number(value.order || 0));
+      });
     }
 
     function makeDraggable(panel, handle) {
@@ -390,9 +406,13 @@
       const snap = snapshotFn();
       if (!snap || !snap.siteContent) return false;
       state.siteContent = clone(snap.siteContent);
+      baseProjectContent = Object.fromEntries(
+        Object.entries(snap.baseProjectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
+      );
       state.projectOverrides = Object.fromEntries(
         Object.entries(snap.projectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
       );
+      reconcileProjectMediaFromBase();
       return true;
     }
 
@@ -403,7 +423,8 @@
       const projectMap = snap?.projectContent || {};
       if (projectMap[projectKey]) {
         const fallbackOrder = sortedProjectKeys().length;
-        state.projectOverrides[projectKey] = normalizeProject(projectMap[projectKey], fallbackOrder);
+        const fallback = baseProjectContent[projectKey] || {};
+        state.projectOverrides[projectKey] = normalizeProject(fillMissingMediaFields(projectMap[projectKey], fallback), fallbackOrder);
         return true;
       }
       return false;
