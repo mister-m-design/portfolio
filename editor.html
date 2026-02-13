@@ -156,7 +156,7 @@
         </div>
       </div>
       <div class="floating-body">
-        <p class="muted">Edit highlighted text in preview. Click a work card to edit video/media data instead of opening it.</p>
+        <p class="muted">Edit highlighted text in preview. Click a work card (or the title chip) to edit project text/media data.</p>
         <p id="editorVersion" class="muted" style="margin-top:0.25rem;"></p>
         <div class="row">
           <button id="saveBtn" class="primary">Save state</button>
@@ -220,7 +220,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.3';
+    const CMS_EDITOR_VERSION = 'v2.2.5';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -512,10 +512,15 @@
           box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45) !important;
           cursor: pointer !important;
         }
-        [data-cms-card-edit='on'] .project-card > * {
+        [data-cms-card-edit='on'] .project-card .card-overlay,
+        [data-cms-card-edit='on'] .project-card .card-title,
+        [data-cms-card-edit='on'] .project-card .card-action,
+        [data-cms-card-edit='on'] .project-card .card-meta {
           pointer-events: none !important;
         }
-        [data-cms-card-edit='on'] .project-card .cms-card-edit-badge {
+        [data-cms-card-edit='on'] .project-card .cms-card-edit-badge,
+        [data-cms-card-edit='on'] .project-card .cms-card-title-chip,
+        [data-cms-card-edit='on'] .project-card img {
           pointer-events: auto !important;
           display: inline-flex !important;
         }
@@ -594,6 +599,18 @@
           card.dataset.cmsCardBound = '1';
         }
 
+        const image = card.querySelector('img');
+        if (image && !image.dataset.cmsImgBound) {
+          image.addEventListener('click', (event) => {
+            if (!projectEditMode) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            openProjectInspector(key);
+          }, true);
+          image.dataset.cmsImgBound = '1';
+        }
+
         if (!card.querySelector('.cms-card-edit-badge')) {
           const badge = doc.createElement('button');
           badge.className = 'cms-card-edit-badge';
@@ -621,6 +638,42 @@
         const badge = card.querySelector('.cms-card-edit-badge');
         if (badge) {
           badge.style.display = projectEditMode ? 'inline-flex' : 'none';
+        }
+
+        if (!card.querySelector('.cms-card-title-chip')) {
+          const chip = doc.createElement('div');
+          chip.className = 'cms-card-title-chip';
+          chip.style.position = 'absolute';
+          chip.style.left = '10px';
+          chip.style.bottom = '10px';
+          chip.style.zIndex = '20';
+          chip.style.padding = '5px 8px';
+          chip.style.borderRadius = '8px';
+          chip.style.border = '1px solid rgba(93, 245, 255, 0.5)';
+          chip.style.background = 'rgba(5, 14, 19, 0.72)';
+          chip.style.color = '#d8fcff';
+          chip.style.fontSize = '12px';
+          chip.style.maxWidth = '70%';
+          chip.style.whiteSpace = 'nowrap';
+          chip.style.overflow = 'hidden';
+          chip.style.textOverflow = 'ellipsis';
+          chip.contentEditable = 'true';
+          chip.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }, true);
+          chip.addEventListener('input', () => {
+            if (!state.projectOverrides[key]) return;
+            state.projectOverrides[key].title = chip.innerText.trim();
+            syncAll('Saving…');
+          });
+          card.appendChild(chip);
+        }
+
+        const chip = card.querySelector('.cms-card-title-chip');
+        if (chip) {
+          chip.style.display = projectEditMode ? 'inline-flex' : 'none';
+          if (state.projectOverrides[key]) chip.textContent = state.projectOverrides[key].title || 'Untitled';
         }
 
         const title = card.querySelector('.card-title');
