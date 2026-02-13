@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor9</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -220,7 +220,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.5';
+    const CMS_EDITOR_VERSION = 'v2.2.6';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -522,6 +522,9 @@
         [data-cms-card-edit='on'] .project-card .cms-card-title-chip,
         [data-cms-card-edit='on'] .project-card img {
           pointer-events: auto !important;
+        }
+        [data-cms-card-edit='on'] .project-card .cms-card-edit-badge,
+        [data-cms-card-edit='on'] .project-card .cms-card-title-chip {
           display: inline-flex !important;
         }
         [data-cms-card-edit='on'] .project-card img,
@@ -553,16 +556,33 @@
       applyCardEditModeStyles(doc);
 
       if (!doc.body.dataset.cmsCardCaptureBound) {
-        doc.addEventListener('click', (event) => {
-          const target = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
-          const card = target?.closest?.('.project-card');
-          if (!card || !projectEditMode) return;
+        const openFromEvent = (event) => {
+          if (!projectEditMode) return;
+          const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+          let card = null;
+          for (const node of path) {
+            if (node && node.classList && node.classList.contains('project-card')) {
+              card = node;
+              break;
+            }
+          }
+          if (!card) {
+            const target = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
+            card = target?.closest?.('.project-card') || null;
+          }
+          if (!card) return;
           event.preventDefault();
           event.stopPropagation();
           if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
           const key = card.dataset.projectKey;
-          if (key) openProjectInspector(key);
-        }, true);
+          if (key) {
+            openProjectInspector(key);
+            setStatus(`Editing card: ${key}`, 'ok');
+          }
+        };
+
+        doc.addEventListener('pointerdown', openFromEvent, true);
+        doc.addEventListener('click', openFromEvent, true);
         doc.body.dataset.cmsCardCaptureBound = '1';
       }
 
