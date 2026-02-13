@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor8</title>
+  <title>Private CMS Editor</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -220,7 +220,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.2';
+    const CMS_EDITOR_VERSION = 'v2.2.3';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -246,6 +246,7 @@
     let selectedSiteId = null;
     let selectedProjectKey = null;
     let projectEditMode = true;
+    let previewCardsObserver = null;
 
     function safeParse(raw, fallback) {
       try { return JSON.parse(raw); } catch { return fallback; }
@@ -478,6 +479,16 @@
       document.getElementById('restoreBtn').classList.toggle('hidden', !value.deleted);
     }
 
+    function watchPreviewCards(doc) {
+      const gallery = doc.getElementById('gallery-grid');
+      if (!gallery) return;
+      if (previewCardsObserver) previewCardsObserver.disconnect();
+      previewCardsObserver = new MutationObserver(() => {
+        setTimeout(enableDirectEditing, 0);
+      });
+      previewCardsObserver.observe(gallery, { childList: true, subtree: true });
+    }
+
     function applyCardEditModeStyles(doc) {
       let style = doc.getElementById('cmsCardEditModeStyle');
       if (!projectEditMode) {
@@ -570,6 +581,18 @@
       doc.querySelectorAll('.project-card').forEach((card) => {
         const key = card.dataset.projectKey;
         if (!key) return;
+
+        card.style.pointerEvents = 'auto';
+        if (!card.dataset.cmsCardBound) {
+          card.addEventListener('click', (event) => {
+            if (!projectEditMode) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            openProjectInspector(key);
+          }, true);
+          card.dataset.cmsCardBound = '1';
+        }
 
         if (!card.querySelector('.cms-card-edit-badge')) {
           const badge = doc.createElement('button');
@@ -745,6 +768,7 @@
       if (!hydrated) loadLocalState();
       syncAll('Saved');
       enableDirectEditing();
+      watchPreviewCards(preview.contentDocument);
       setStatus(hydrated ? 'Preview connected' : 'Loaded local state', hydrated ? 'ok' : 'warn');
       runEditorHealthCheck();
     });
