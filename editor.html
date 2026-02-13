@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor7</title>
+  <title>Private CMS Editor8</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -163,6 +163,8 @@
           <button id="applyBtn">Apply to index.html</button>
           <button id="downloadBtn">Download index.html</button>
           <button id="addProjectBtn">Add project</button>
+          <button id="reloadPreviewBtn">Reload preview</button>
+          <button id="clearCacheBtn">Clear cache</button>
           <button id="resetBtn">Reset</button>
           <button id="toggleProjectEditBtn">Card edit mode: On</button>
           <span id="status" class="status">Ready</span>
@@ -218,7 +220,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.1';
+    const CMS_EDITOR_VERSION = 'v2.2.2';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -312,6 +314,24 @@
       const versionEl = document.getElementById('editorVersion');
       if (!versionEl) return;
       versionEl.textContent = `Editor version: ${CMS_EDITOR_VERSION}`;
+    }
+
+    function runEditorHealthCheck() {
+      try {
+        const doc = preview.contentDocument;
+        const cards = doc ? doc.querySelectorAll('.project-card').length : 0;
+        if (!doc) {
+          setStatus('Preview not accessible yet', 'warn');
+          return;
+        }
+        if (cards === 0) {
+          setStatus('Preview loaded, but no project cards found', 'warn');
+          return;
+        }
+        setStatus(`Preview healthy (${cards} cards)`, 'ok');
+      } catch (error) {
+        setStatus('Preview blocked (origin/sandbox issue)', 'warn');
+      }
     }
 
     function persistState(text = 'Saved') {
@@ -726,6 +746,7 @@
       syncAll('Saved');
       enableDirectEditing();
       setStatus(hydrated ? 'Preview connected' : 'Loaded local state', hydrated ? 'ok' : 'warn');
+      runEditorHealthCheck();
     });
 
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -779,6 +800,23 @@
         setStatus('Download failed', 'warn');
         alert(`Download failed: ${error.message}`);
       }
+    });
+
+    document.getElementById('reloadPreviewBtn').addEventListener('click', () => {
+      preview.src = `${INDEX_URL}?t=${Date.now()}`;
+      setStatus('Reloading preview…', 'warn');
+    });
+
+    document.getElementById('clearCacheBtn').addEventListener('click', () => {
+      localStorage.removeItem(EDITOR_STATE_KEY);
+      sessionStorage.removeItem('editorUnlocked');
+      setStatus('Cleared local editor cache', 'warn');
+      alert('Editor cache cleared. Reloading now.');
+      window.location.reload();
+    });
+
+    window.addEventListener('error', () => {
+      setStatus('Editor error detected. Try Reload preview or Clear cache.', 'warn');
     });
 
     setVersionUI();
