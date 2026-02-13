@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor</title>
+  <title>Private CMS Editor3</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -134,6 +134,13 @@
     }
 
     .show-controls { display: flex; gap: 0.45rem; }
+
+    .project-list { display: grid; gap: 0.35rem; margin-bottom: 0.6rem; }
+    .project-list-item { display:flex; gap:0.35rem; align-items:center; border:1px solid var(--border); border-radius:8px; padding:0.3rem 0.4rem; background:#0f1420; cursor:pointer; }
+    .project-list-item .name { flex:1; font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .project-list-item.active { border-color:#66e9ff; box-shadow:0 0 0 1px rgba(102,233,255,0.35) inset; }
+    .project-list-item .mini { padding:0.2rem 0.4rem; font-size:0.72rem; }
+
   </style>
 </head>
 <body>
@@ -188,6 +195,8 @@
         </div>
 
         <div id="projectInspector" class="hidden">
+          <label class="label">Projects (click to edit, drag to reorder)</label>
+          <div id="projectList" class="project-list"></div>
           <label class="label">Title</label><input id="pTitle" />
           <label class="label">Category</label><input id="pCategory" />
           <label class="label">Role</label><input id="pRole" />
@@ -220,7 +229,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.2.6';
+    const CMS_EDITOR_VERSION = 'v2.3.0';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -247,6 +256,7 @@
     let selectedProjectKey = null;
     let projectEditMode = true;
     let previewCardsObserver = null;
+    let dragProjectKey = null;
 
     function safeParse(raw, fallback) {
       try { return JSON.parse(raw); } catch { return fallback; }
@@ -420,17 +430,68 @@
         .map(([k]) => k);
     }
 
+
+    function applyProjectOrder(keys, focusKey = null) {
+      keys.forEach((k, idx) => {
+        if (state.projectOverrides[k]) state.projectOverrides[k].order = idx;
+      });
+      syncAll('Saved');
+      renderProjectList();
+      if (focusKey) openProjectInspector(focusKey);
+    }
+
+    function renderProjectList() {
+      const root = document.getElementById('projectList');
+      if (!root) return;
+      root.innerHTML = '';
+      const keys = sortedProjectKeys();
+      keys.forEach((key, idx) => {
+        const item = document.createElement('div');
+        item.className = `project-list-item${selectedProjectKey === key ? ' active' : ''}`;
+        item.draggable = true;
+        item.dataset.key = key;
+
+        item.addEventListener('dragstart', () => { dragProjectKey = key; item.style.opacity = '0.5'; });
+        item.addEventListener('dragend', () => { item.style.opacity = '1'; dragProjectKey = null; });
+        item.addEventListener('dragover', (e) => e.preventDefault());
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          if (!dragProjectKey || dragProjectKey === key) return;
+          const ordered = sortedProjectKeys();
+          const from = ordered.indexOf(dragProjectKey);
+          const to = ordered.indexOf(key);
+          ordered.splice(to, 0, ordered.splice(from, 1)[0]);
+          applyProjectOrder(ordered, dragProjectKey);
+        });
+
+        const name = document.createElement('button');
+        name.type = 'button';
+        name.className = 'mini';
+        name.style.flex = '1';
+        name.style.textAlign = 'left';
+        name.textContent = state.projectOverrides[key]?.title || key;
+        name.addEventListener('click', () => openProjectInspector(key));
+
+        const up = document.createElement('button');
+        up.type = 'button'; up.className='mini'; up.textContent='↑';
+        up.addEventListener('click', (e) => { e.stopPropagation(); moveProject(key, -1); });
+
+        const down = document.createElement('button');
+        down.type = 'button'; down.className='mini'; down.textContent='↓';
+        down.addEventListener('click', (e) => { e.stopPropagation(); moveProject(key, 1); });
+
+        item.append(name, up, down);
+        root.appendChild(item);
+      });
+    }
+
     function moveProject(key, dir) {
       const keys = sortedProjectKeys();
       const i = keys.indexOf(key);
       const next = i + dir;
       if (i < 0 || next < 0 || next >= keys.length) return;
       [keys[i], keys[next]] = [keys[next], keys[i]];
-      keys.forEach((k, idx) => {
-        if (state.projectOverrides[k]) state.projectOverrides[k].order = idx;
-      });
-      syncAll('Saved');
-      openProjectInspector(key);
+      applyProjectOrder(keys, key);
     }
 
     function showInspector(mode) {
@@ -477,6 +538,7 @@
       document.getElementById('pOrder').value = String(Number(value.order || 0));
       document.getElementById('deleteBtn').classList.toggle('hidden', value.deleted);
       document.getElementById('restoreBtn').classList.toggle('hidden', !value.deleted);
+      renderProjectList();
     }
 
     function watchPreviewCards(doc) {
@@ -844,6 +906,7 @@
       watchPreviewCards(preview.contentDocument);
       setStatus(hydrated ? 'Preview connected' : 'Loaded local state', hydrated ? 'ok' : 'warn');
       runEditorHealthCheck();
+      renderProjectList();
     });
 
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -855,6 +918,7 @@
       const key = `custom:${Date.now()}`;
       state.projectOverrides[key] = normalizeProject({ title: 'New Project', order: sortedProjectKeys().length }, sortedProjectKeys().length);
       syncAll('Saved');
+      renderProjectList();
       openProjectInspector(key);
     });
 
