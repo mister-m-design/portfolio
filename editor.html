@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor3</title>
+  <title>Private CMS Editor4</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -229,7 +229,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.3.0';
+    const CMS_EDITOR_VERSION = 'v2.3.1';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -412,7 +412,8 @@
       if (hydrateProjectFromPreview(projectKey)) return true;
 
       const doc = preview.contentDocument;
-      const card = doc?.querySelector(`.project-card[data-project-key="${CSS.escape(projectKey)}"]`);
+      const cards = doc ? Array.from(doc.querySelectorAll('.project-card')) : [];
+      const card = cards.find((node) => (node.dataset?.projectKey || '') === projectKey);
       if (!card) return false;
 
       const title = card.querySelector('.card-title')?.innerText?.trim() || 'Untitled Project';
@@ -569,10 +570,14 @@
 
       style.textContent = `
         [data-cms-card-edit='on'] .project-card {
-          outline: 2px solid rgba(93, 245, 255, 0.82) !important;
-          outline-offset: -2px !important;
+          outline: none !important;
           box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45) !important;
           cursor: pointer !important;
+        }
+        [data-cms-card-edit='on'] .project-card[data-cms-selected='1'] {
+          outline: 2px solid rgba(93, 245, 255, 0.9) !important;
+          outline-offset: -2px !important;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(93, 245, 255, 0.25) !important;
         }
         [data-cms-card-edit='on'] .project-card .card-overlay,
         [data-cms-card-edit='on'] .project-card .card-title,
@@ -639,7 +644,7 @@
           const key = card.dataset.projectKey;
           if (key) {
             openProjectInspector(key);
-            setStatus(`Editing card: ${key}`, 'ok');
+            setStatus(`Editing: ${state.projectOverrides[key]?.title || key}`, 'ok');
           }
         };
 
@@ -669,6 +674,7 @@
         const key = card.dataset.projectKey;
         if (!key) return;
 
+        card.dataset.cmsSelected = selectedProjectKey === key ? '1' : '0';
         card.style.pointerEvents = 'auto';
         if (!card.dataset.cmsCardBound) {
           card.addEventListener('click', (event) => {
