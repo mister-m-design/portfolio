@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private CMS Editor</title>
+  <title>Private CMS Editor A</title>
   <style>
     :root {
       --bg: #0b0c11;
@@ -231,7 +231,7 @@
 
   <script>
     const EDITOR_KEY = 'mrm-private-editor';
-    const CMS_EDITOR_VERSION = 'v2.3.4';
+    const CMS_EDITOR_VERSION = 'v2.3.5';
     const EDITOR_STATE_KEY = 'mrm_editor_state_v1';
     const CHANNEL_NAME = 'mrm_editor_channel';
     const INDEX_URL = new URL('index.html', window.location.href).toString();
@@ -299,6 +299,43 @@
       if (!keyBase) return null;
       const match = Object.entries(baseProjectContent).find(([projectKey]) => basename(projectKey).toLowerCase() == keyBase);
       return match ? match[1] : null;
+    }
+
+
+    function resolveCanonicalProjectKey(key) {
+      if (!key || typeof key !== 'string') return key;
+      if (baseProjectContent[key]) return key;
+      const keyBase = basename(key).toLowerCase();
+      if (!keyBase) return key;
+      const match = Object.keys(baseProjectContent).find((projectKey) => basename(projectKey).toLowerCase() === keyBase);
+      return match || key;
+    }
+
+    function normalizeStateProjectKey(projectKey) {
+      const canonicalKey = resolveCanonicalProjectKey(projectKey);
+      if (!canonicalKey || canonicalKey === projectKey) return canonicalKey || projectKey;
+
+      const current = state.projectOverrides[projectKey] || {};
+      const existing = state.projectOverrides[canonicalKey] || {};
+      state.projectOverrides[canonicalKey] = normalizeProject({
+        ...current,
+        ...existing,
+        order: Number.isFinite(Number(existing.order)) ? Number(existing.order) : Number(current.order || 0),
+        deleted: !!(existing.deleted || current.deleted)
+      }, Number(current.order || 0));
+      delete state.projectOverrides[projectKey];
+      return canonicalKey;
+    }
+
+    function refreshBaseProjectContentFromSnapshot() {
+      const snapshotFn = preview.contentWindow?.getPortfolioEditorSnapshot;
+      if (typeof snapshotFn !== 'function') return false;
+      const snap = snapshotFn();
+      if (!snap || !snap.baseProjectContent) return false;
+      baseProjectContent = Object.fromEntries(
+        Object.entries(snap.baseProjectContent).map(([k, v], i) => [k, normalizeProject(v, i)])
+      );
+      return true;
     }
 
     function fillMissingMediaFields(project = {}, fallback = {}) {
@@ -423,9 +460,7 @@
       const snap = snapshotFn();
       if (!snap || !snap.siteContent) return false;
       state.siteContent = clone(snap.siteContent);
-      baseProjectContent = Object.fromEntries(
-        Object.entries(snap.baseProjectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
-      );
+      refreshBaseProjectContentFromSnapshot();
       state.projectOverrides = Object.fromEntries(
         Object.entries(snap.projectContent || {}).map(([k, v], i) => [k, normalizeProject(v, i)])
       );
@@ -577,26 +612,33 @@
     }
 
     function openProjectInspector(projectKey) {
+      refreshBaseProjectContentFromSnapshot();
+      projectKey = normalizeStateProjectKey(projectKey);
       if (!ensureProjectExists(projectKey)) return;
-      const value = state.projectOverrides[projectKey];
-      if (!value) return;
+      projectKey = normalizeStateProjectKey(projectKey);
+
+      const fallback = getBaseProjectForKey(projectKey) || {};
+      const hydrated = normalizeProject(fillMissingMediaFields(state.projectOverrides[projectKey] || {}, fallback), Number(state.projectOverrides[projectKey]?.order || 0));
+      state.projectOverrides[projectKey] = hydrated;
+
       selectedProjectKey = projectKey;
       selectedSiteId = null;
       showInspector('project');
       inspectorTitle.textContent = `Editing work item: ${projectKey}`;
-      document.getElementById('pTitle').value = value.title || '';
-      document.getElementById('pCategory').value = value.category || '';
-      document.getElementById('pRole').value = value.role || '';
-      document.getElementById('pYear').value = value.year || '';
-      document.getElementById('pStudio').value = value.studio || '';
-      document.getElementById('pDeliverables').value = value.deliverables || '';
-      document.getElementById('pDescription').value = value.description || '';
-      document.getElementById('pFile').value = value.file || '';
-      document.getElementById('pVimeo').value = value.vimeo || '';
-      document.getElementById('pFrames').value = value.frames || '';
-      document.getElementById('pOrder').value = String(Number(value.order || 0));
-      document.getElementById('deleteBtn').classList.toggle('hidden', value.deleted);
-      document.getElementById('restoreBtn').classList.toggle('hidden', !value.deleted);
+      document.getElementById('pTitle').value = hydrated.title || '';
+      document.getElementById('pCategory').value = hydrated.category || '';
+      document.getElementById('pRole').value = hydrated.role || '';
+      document.getElementById('pYear').value = hydrated.year || '';
+      document.getElementById('pStudio').value = hydrated.studio || '';
+      document.getElementById('pDeliverables').value = hydrated.deliverables || '';
+      document.getElementById('pDescription').value = hydrated.description || '';
+      document.getElementById('pFile').value = hydrated.file || '';
+      document.getElementById('pVimeo').value = hydrated.vimeo || '';
+      document.getElementById('pFrames').value = hydrated.frames || '';
+      document.getElementById('pOrder').value = String(Number(hydrated.order || 0));
+      document.getElementById('deleteBtn').classList.toggle('hidden', hydrated.deleted);
+      document.getElementById('restoreBtn').classList.toggle('hidden', !hydrated.deleted);
+      syncAll('Saved');
       renderProjectList();
     }
 
