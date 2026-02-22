@@ -84,6 +84,11 @@ function compile() {
         settings
     };
 
+    const outputDir = path.dirname(OUTPUT_FILE);
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
     console.log(`Content compiled to ${OUTPUT_FILE}`);
 }
