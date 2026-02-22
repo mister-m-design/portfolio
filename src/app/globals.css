@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-inter, "Inter", sans-serif);
+  --font-body: var(--font-inter, "Inter", sans-serif);
+
+
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+}
+
+:root {
+  --logo-filter: none;
+  --bg: #050505;
+  --card: #111111;
+  --text: #ffffff;
+  --muted: #888888;
+  --accent: #ff3b3b;
+}
+
+[data-theme="light"] {
+  --logo-filter: invert(1);
+  --bg: #ffffff;
+  --card: #f9f9f9;
+  --text: #050505;
+  --muted: #666666;
+  --accent: #0071e3;
+}
+
+[data-font="Inter"] {
+  --font-display: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+[data-font="Montserrat"] {
+  --font-display: "Montserrat", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Hide scrollbar for cleaner look during smooth scroll */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Theme-specific filters for Logo */
+.logo-img {
+  filter: invert(0);
+  /* Default to white logo initially */
+}
+
+[data-theme="light"] .logo-img {
+  filter: invert(1);
+  /* Black logo for light theme */
+}
+
+/* Theme-specific filters for Background Grid */
+[data-theme="dark"] .hero-bg-grid,
+:root:not([data-theme="light"]) .hero-bg-grid {
+  filter: brightness(0.65) contrast(1.1) saturate(1.2);
+}
+
+[data-theme="light"] .hero-bg-grid {
+  filter: brightness(1.2) contrast(1.1) saturate(0.2);
+}
