@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "compile": "node scripts/compile-content.js",
+    "dev": "npm run compile && next dev",
+    "build": "npm run compile && next build",
     "start": "next start",
     "lint": "next lint"
   },

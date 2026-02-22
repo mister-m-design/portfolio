@@ -3,10 +3,11 @@
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { MoveRight } from "lucide-react";
-import { projects } from "@/data/projects";
+import cmsData from "@/data/cms-data.json";
 import { useProject } from "./ProjectModalContext";
 
 export function ProjectGrid() {
+    const { projects } = cmsData;
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-16 lg:gap-x-10 lg:gap-y-20">
             {projects.map((project, index) => (

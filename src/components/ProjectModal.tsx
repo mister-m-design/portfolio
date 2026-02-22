@@ -102,10 +102,10 @@ export function ProjectModal({ project, onClose }: { project: any, onClose: () =
                             {project.frames.map((frame: string, idx: number) => (
                                 <img
                                     key={idx}
-                                    src={'/' + frame}
+                                    src={frame.startsWith('/') ? frame : '/' + frame}
                                     alt={`${project.title} frame ${idx + 1}`}
                                     className="w-full h-auto rounded-sm cursor-zoom-in hover:scale-[1.02] transition-transform"
-                                    onClick={() => setLightboxImg('/' + frame)}
+                                    onClick={() => setLightboxImg(frame.startsWith('/') ? frame : '/' + frame)}
                                 />
                             ))}
                         </div>

@@ -1,19 +1,20 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { projects } from '@/data/projects';
+import cmsData from '@/data/cms-data.json';
 import { ProjectModal } from './ProjectModal';
 
 interface ProjectContextType {
     openProject: (projectId: string) => void;
     closeProject: () => void;
-    activeProject: typeof projects[0] | null;
+    activeProject: any | null;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
-    const [activeProject, setActiveProject] = useState<typeof projects[0] | null>(null);
+    const { projects } = cmsData;
+    const [activeProject, setActiveProject] = useState<any | null>(null);
 
     const openProject = (projectId: string) => {
         const project = projects.find(p => p.id === projectId);

@@ -12,11 +12,12 @@ if (typeof window !== 'undefined') {
 
 import { usePlayer } from '@/components/PlayerContext';
 import { Play } from 'lucide-react';
-import { projects } from '@/data/projects';
+import cmsData from '@/data/cms-data.json';
 
 export default function Home() {
     const heroContentRef = useRef(null);
     const { openPlayer } = usePlayer();
+    const { settings, projects } = cmsData;
 
     useEffect(() => {
         // High-end entrance animation
@@ -100,20 +101,20 @@ export default function Home() {
                     {/* Main Headline */}
                     <div className="max-w-[100vw] lg:max-w-5xl" style={{ perspective: '1000px' }}>
                         <h1 className="font-display font-black uppercase leading-none tracking-tighter text-[min(12.5vw,22vh)] lg:text-[min(9vw,26vh)] text-text flex flex-col relative left-[-0.5vw]">
-                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] w-full">Cinematic</span>
-                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] text-transparent bg-clip-text bg-gradient-to-br from-text via-text/80 to-text/20 w-full">Motion</span>
-                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] w-full">Design</span>
+                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] w-full">{settings.hero.line1}</span>
+                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] text-transparent bg-clip-text bg-gradient-to-br from-text via-text/80 to-text/20 w-full">{settings.hero.line2}</span>
+                            <span className="hero-text-line overflow-hidden pb-4 pt-2 leading-[0.95] w-full">{settings.hero.line3}</span>
                         </h1>
                     </div>
 
                     {/* Metadata & Actions */}
                     <div className="hero-meta flex flex-col items-start lg:items-end gap-10 max-w-sm lg:text-right">
                         <p className="font-body text-base md:text-lg text-muted leading-relaxed font-light lg:text-right">
-                            Art direction and motion design for film, television, and gaming. Focusing on world-building through sequential design.
+                            {settings.hero.description}
                         </p>
 
                         <button
-                            onClick={() => openPlayer('74537740')}
+                            onClick={() => openPlayer(settings.hero.vimeoId)}
                             className="group flex items-center justify-center gap-4 bg-white text-black px-8 py-5 rounded-full font-display text-xs font-bold uppercase tracking-[0.2em] transition-all hover:bg-[#eee] hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] whitespace-nowrap"
                         >
                             <span>Play Showreel</span>
@@ -145,7 +146,7 @@ export default function Home() {
                         <p className="font-body text-muted font-light">Available for freelance opportunities and collaborations.</p>
                     </div>
 
-                    <form action="https://formsubmit.co/mmurtha@gmail.com" method="POST" className="flex flex-col gap-6">
+                    <form action={`https://formsubmit.co/${settings.contact.email}`} method="POST" className="flex flex-col gap-6">
                         {/* Honeypot & Config for FormSubmit to prevent spam and captcha if possible */}
                         <input type="hidden" name="_subject" value="New message from MRM Portfolio!" />
                         <input type="hidden" name="_captcha" value="false" />
@@ -170,13 +171,13 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                     <h3 className="font-display uppercase tracking-[0.3em] text-[0.65rem] text-muted font-bold mb-2">Location</h3>
                     <p className="font-display font-medium text-lg text-text opacity-80 transition-all tracking-tight">
-                        Los Angeles, CA
+                        {settings.contact.location}
                     </p>
                 </div>
 
                 <div className="flex flex-col items-start md:items-end gap-2 font-display text-[0.65rem] tracking-[0.2em] uppercase text-muted">
-                    <p className="text-text/50 mb-2 hover:text-text transition-colors cursor-pointer" onClick={() => window.location.href = 'mailto:mmurtha@gmail.com'}>mmurtha@gmail.com</p>
-                    <p className="text-text/50">© 2026 Michael Rush Murtha</p>
+                    <p className="text-text/50 mb-2 hover:text-text transition-colors cursor-pointer" onClick={() => window.location.href = `mailto:${settings.contact.email}`}>{settings.contact.email}</p>
+                    <p className="text-text/50">© {new Date().getFullYear()} Michael Rush Murtha</p>
                 </div>
             </footer>
         </main>

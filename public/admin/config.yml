@@ -1,0 +1,44 @@
+backend:
+  name: github
+  repo: mister-m-design/portfolio
+  branch: main
+
+media_folder: "public/assets"
+public_folder: "/assets"
+
+collections:
+  - name: "settings"
+    label: "Site Settings"
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: "site"
+        label: "General Settings"
+        file: "src/content/settings/site.json"
+        fields:
+          - { label: "Hero Line 1", name: "hero.line1", widget: "string" }
+          - { label: "Hero Line 2", name: "hero.line2", widget: "string" }
+          - { label: "Hero Line 3", name: "hero.line3", widget: "string" }
+          - { label: "Hero Description", name: "hero.description", widget: "text" }
+          - { label: "Showreel Vimeo ID", name: "hero.vimeoId", widget: "string" }
+          - { label: "Contact Email", name: "contact.email", widget: "string" }
+          - { label: "Location", name: "contact.location", widget: "string" }
+
+  - name: "projects"
+    label: "Projects"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "ID (Unique)", name: "id", widget: "string" }
+      - { label: "Thumbnail Image", name: "file", widget: "image" }
+      - { label: "Vimeo ID(s)", name: "vimeo", widget: "list", summary: "{{fields.vimeo}}" }
+      - { label: "Category", name: "category", widget: "string" }
+      - { label: "Role", name: "role", widget: "string" }
+      - { label: "Year", name: "year", widget: "string" }
+      - { label: "Studio/Client", name: "studio", widget: "string" }
+      - { label: "Deliverables/Tasks", name: "deliverables", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Style Frames", name: "frames", widget: "list", field: { label: "Image", widget: "image" } }
