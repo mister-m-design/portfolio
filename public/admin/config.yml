@@ -42,4 +42,4 @@ collections:
       - { label: "Studio/Client", name: "studio", widget: "string" }
       - { label: "Deliverables/Tasks", name: "deliverables", widget: "string" }
       - { label: "Description", name: "description", widget: "text" }
-      - { label: "Style Frames", name: "frames", widget: "list", field: { label: "Image", widget: "image" } }
+      - { label: "Style Frames", name: "frames", widget: "list", field: { label: "Image", name: "image", widget: "image" } }
